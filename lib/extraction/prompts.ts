@@ -1,0 +1,113 @@
+// Extraction prompts for different document types
+import type { DocumentType } from '@/types'
+
+export const DOCUMENT_TYPES: DocumentType[] = [
+  'ID_CARD',
+  'BANK_STATEMENT',
+  'PAY_STUB',
+  'TAX_RETURN',
+  'UTILITY_BILL',
+  'EMPLOYMENT_LETTER',
+  'UNKNOWN',
+]
+
+export const EXTRACTION_PROMPTS: Record<DocumentType, string> = {
+  ID_CARD: `Extract these fields from the ID document OCR text.
+Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": 0.95}]}
+
+Fields to extract:
+- full_name
+- date_of_birth (YYYY-MM-DD format)
+- address
+- document_number
+- expiry_date (YYYY-MM-DD format)
+- issuing_state
+
+Set confidence 0.0-1.0 based on text clarity. Use null if not found.`,
+
+  BANK_STATEMENT: `Extract these fields from the bank statement OCR text.
+Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": 0.95}]}
+
+Fields to extract:
+- account_holder_name
+- account_number (last 4 digits only for security)
+- bank_name
+- statement_period_start (YYYY-MM-DD)
+- statement_period_end (YYYY-MM-DD)
+- opening_balance (number only)
+- closing_balance (number only)
+- total_deposits (number only)
+- total_withdrawals (number only)
+
+Set confidence 0.0-1.0 based on text clarity. Use null if not found.`,
+
+  PAY_STUB: `Extract these fields from the pay stub OCR text.
+Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": 0.95}]}
+
+Fields to extract:
+- employee_name
+- employer_name
+- pay_period_start (YYYY-MM-DD)
+- pay_period_end (YYYY-MM-DD)
+- gross_pay (number only)
+- net_pay (number only)
+- ytd_gross (number only)
+- pay_frequency (weekly/biweekly/monthly)
+
+Set confidence 0.0-1.0 based on text clarity. Use null if not found.`,
+
+  TAX_RETURN: `Extract these fields from the tax document OCR text.
+Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": 0.95}]}
+
+Fields to extract:
+- taxpayer_name
+- tax_year
+- filing_status
+- total_income (number only)
+- adjusted_gross_income (number only)
+- taxable_income (number only)
+- total_tax (number only)
+- employer_name (if W2)
+- wages (if W2, number only)
+
+Set confidence 0.0-1.0 based on text clarity. Use null if not found.`,
+
+  UTILITY_BILL: `Extract these fields from the utility bill OCR text.
+Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": 0.95}]}
+
+Fields to extract:
+- account_holder_name
+- service_address
+- bill_date (YYYY-MM-DD)
+- amount_due (number only)
+- utility_provider
+
+Set confidence 0.0-1.0 based on text clarity. Use null if not found.`,
+
+  EMPLOYMENT_LETTER: `Extract these fields from the employment letter OCR text.
+Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": 0.95}]}
+
+Fields to extract:
+- employee_name
+- employer_name
+- job_title
+- employment_start_date (YYYY-MM-DD)
+- salary (number only)
+- salary_frequency (annual/monthly/hourly)
+- employment_status (full-time/part-time/contract)
+
+Set confidence 0.0-1.0 based on text clarity. Use null if not found.`,
+
+  UNKNOWN: `Extract any relevant personal or financial information from this document.
+Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": 0.95}]}
+
+Look for:
+- Names
+- Dates
+- Addresses
+- Account numbers
+- Monetary amounts
+- Any identifying information
+
+Set confidence 0.0-1.0 based on text clarity.`,
+}
