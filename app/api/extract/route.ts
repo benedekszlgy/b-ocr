@@ -186,11 +186,26 @@ export async function POST(request: NextRequest) {
       // Don't fail the whole request if embedding generation fails
     }
 
+    // Get chunk count for this document to verify they were created
+    let chunkCount = 0
+    try {
+      const { count } = await supabase
+        .from('document_chunks')
+        .select('*', { count: 'exact', head: true })
+        .eq('document_id', documentId)
+
+      chunkCount = count || 0
+      console.log('[Extract] Final chunk count for document:', chunkCount)
+    } catch (e) {
+      console.error('[Extract] Error counting chunks:', e)
+    }
+
     return NextResponse.json({
       success: true,
       documentType: classification.type,
       classificationConfidence: classification.confidence,
       fieldsExtracted: fields.length,
+      chunksCreated: chunkCount,
       extractedFields: fields.map(f => ({
         fieldName: f.key,
         value: f.value,

@@ -111,7 +111,8 @@ export function UploadQueueProvider({ children }: { children: React.ReactNode })
         throw new Error(extractData.error || 'Extraction failed')
       }
 
-      console.log('[Queue] Extraction successful!')
+      console.log('[Queue] Extraction successful!', extractData)
+      console.log('[Queue] Chunks created:', extractData.chunksCreated || 0)
       setQueue(prev => prev.map(item =>
         item.id === doc.id
           ? { ...item, status: 'complete' as const, progress: 100, result: extractData }
