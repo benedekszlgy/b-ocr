@@ -42,8 +42,8 @@ export async function GET(
     }
 
     const extractedFields = fields?.map(f => ({
-      fieldName: f.field_name,
-      value: f.value,
+      fieldName: f.field_key,
+      value: f.field_value,
       confidence: f.confidence
     })) || []
 
