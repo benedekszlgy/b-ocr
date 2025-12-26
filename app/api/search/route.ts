@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     // Use Supabase's vector search function to find similar chunks
     const { data: similarChunks, error: searchError } = await supabase
       .rpc('search_document_chunks', {
-        query_embedding: JSON.stringify(queryEmbedding),
+        query_embedding: `[${queryEmbedding.join(',')}]`,
         match_threshold: 0.5, // Lower threshold for more results
         match_count: 20,
         filter_user_id: user.id

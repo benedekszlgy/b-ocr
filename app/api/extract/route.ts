@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
           document_id: documentId,
           chunk_text: chunk.text,
           chunk_index: chunk.index,
-          embedding: JSON.stringify(embeddings[idx])
+          embedding: `[${embeddings[idx].join(',')}]`
         }))
 
         const { error: chunkError } = await supabase

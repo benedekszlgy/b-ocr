@@ -96,16 +96,16 @@ function FeldolgozasContent() {
                 <polyline points="14,2 14,8 20,8"/>
               </svg>
               <h3 className="text-lg font-semibold text-kavosz-text-primary mb-2">
-                Nincs kiválasztott dokumentum
+                {t('documentDetails.noDocumentSelected', language)}
               </h3>
               <p className="text-sm text-kavosz-text-muted mb-6">
-                Válasszon egy dokumentumot a dashboardról
+                {t('documentDetails.selectDocument', language)}
               </p>
               <button
                 onClick={() => router.push('/dashboard')}
                 className="px-6 py-3 text-sm font-medium text-white bg-kavosz-teal-primary hover:bg-kavosz-teal-hover rounded-lg transition-colors"
               >
-                Vissza a dashboardra
+                {t('documentDetails.backToDashboard', language)}
               </button>
             </div>
           </div>
@@ -188,7 +188,7 @@ function FeldolgozasContent() {
                 onClick={() => setShowJson(!showJson)}
                 className="px-6 py-3 text-sm font-medium text-white bg-kavosz-teal-primary hover:bg-kavosz-teal-hover rounded-lg transition-colors"
               >
-                {showJson ? 'Mezők mutatása' : 'Részletek (JSON)'}
+                {showJson ? t('documentDetails.showFields', language) : t('documentDetails.showJson', language)}
               </button>
               <button
                 onClick={handleDelete}
@@ -198,14 +198,14 @@ function FeldolgozasContent() {
                   <polyline points="3,6 5,6 21,6"/>
                   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
                 </svg>
-                Ügylet törlése
+                {t('documentDetails.deleteDocument', language)}
               </button>
             </div>
 
             {/* JSON View */}
             {showJson && (
               <div className="mt-6 pt-6 border-t border-kavosz-border">
-                <h4 className="text-sm font-semibold text-kavosz-text-primary mb-3">JSON Részletek</h4>
+                <h4 className="text-sm font-semibold text-kavosz-text-primary mb-3">{t('documentDetails.jsonDetails', language)}</h4>
                 <pre className="bg-gray-50 border border-kavosz-border rounded-lg p-4 text-xs overflow-auto max-h-96">
                   {JSON.stringify(document, null, 2)}
                 </pre>

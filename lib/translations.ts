@@ -79,6 +79,12 @@ export const uiTranslations = {
     backToDashboard: { hu: 'Vissza a dashboardra', en: 'Back to Dashboard' },
     notFound: { hu: 'Dokumentum nem található', en: 'Document Not Found' },
     notFoundDesc: { hu: 'A keresett dokumentum nem létezik vagy nem érhető el', en: 'The requested document does not exist or is not accessible' },
+    showFields: { hu: 'Mezők mutatása', en: 'Show Fields' },
+    showJson: { hu: 'Részletek (JSON)', en: 'Details (JSON)' },
+    deleteDocument: { hu: 'Ügylet törlése', en: 'Delete Document' },
+    jsonDetails: { hu: 'JSON Részletek', en: 'JSON Details' },
+    noDocumentSelected: { hu: 'Nincs kiválasztott dokumentum', en: 'No Document Selected' },
+    selectDocument: { hu: 'Válasszon egy dokumentumot a dashboardról', en: 'Select a document from the dashboard' },
   },
 
   // Login
