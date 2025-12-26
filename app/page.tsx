@@ -44,31 +44,26 @@ export default function HomePage() {
 
           <div className="space-y-4">
             <Link
-              href="/dashboard"
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-lg text-lg transition-colors"
+              href="/upload"
+              className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-lg text-lg transition-colors shadow-lg hover:shadow-xl"
             >
-              Get Started →
+              Upload Document →
             </Link>
             <p className="text-sm text-gray-500">
-              First, set up your Supabase project and add environment variables
+              Upload bank statements, pay stubs, ID cards, and more
             </p>
           </div>
 
-          <div className="mt-16 p-6 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <h3 className="font-semibold text-yellow-900 mb-2">⚠️ Setup Required</h3>
-            <p className="text-sm text-yellow-800">
-              Before using this app, you need to:
-            </p>
-            <ol className="text-sm text-yellow-800 text-left mt-2 ml-6 list-decimal">
-              <li>Create a Supabase project</li>
-              <li>Run the database migration</li>
-              <li>Create a storage bucket named "documents"</li>
-              <li>Add your API keys to .env.local</li>
-              <li>Set up authentication</li>
-            </ol>
-            <p className="text-sm text-yellow-800 mt-3">
-              See <code className="bg-yellow-100 px-2 py-1 rounded">README.md</code> for complete instructions
-            </p>
+          <div className="mt-16 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+            <h3 className="font-semibold text-blue-900 mb-2">📋 Supported Documents</h3>
+            <div className="grid md:grid-cols-2 gap-3 text-left mt-3">
+              <div className="text-sm text-blue-800">• ID Cards (Driver License, Passport)</div>
+              <div className="text-sm text-blue-800">• Bank Statements</div>
+              <div className="text-sm text-blue-800">• Pay Stubs</div>
+              <div className="text-sm text-blue-800">• Tax Returns (W-2, 1099)</div>
+              <div className="text-sm text-blue-800">• Utility Bills</div>
+              <div className="text-sm text-blue-800">• Employment Letters</div>
+            </div>
           </div>
         </div>
       </div>
