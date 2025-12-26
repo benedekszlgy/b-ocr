@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { UploadQueueProvider } from "@/contexts/UploadQueueContext";
+import UploadProgress from "@/components/UploadProgress";
 import "./globals.css";
 
 const inter = Inter({
@@ -23,7 +25,10 @@ export default function RootLayout({
     <html lang="hu">
       <body className={inter.className}>
         <LanguageProvider>
-          {children}
+          <UploadQueueProvider>
+            {children}
+            <UploadProgress />
+          </UploadQueueProvider>
         </LanguageProvider>
       </body>
     </html>
