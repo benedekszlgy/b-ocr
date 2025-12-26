@@ -10,7 +10,7 @@ export default function Header() {
     <header className="bg-white border-b border-kavosz-border">
       <div className="max-w-[1200px] mx-auto px-6 h-16 flex justify-between items-center">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 cursor-pointer">
+        <Link href="/dashboard" className="flex items-center gap-3 cursor-pointer">
           <div className="w-9 h-9 bg-kavosz-teal-light rounded-lg flex items-center justify-center">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="#0d9488">
               <rect x="3" y="3" width="8" height="8" rx="1"/>
@@ -38,9 +38,9 @@ export default function Header() {
             <span>Új dokumentum</span>
           </Link>
           <Link
-            href="/upload"
+            href="/feldolgozas"
             className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${
-              pathname === '/upload'
+              pathname === '/feldolgozas'
                 ? 'text-kavosz-teal-primary bg-kavosz-teal-light'
                 : 'text-kavosz-text-secondary bg-transparent hover:bg-kavosz-teal-light/50'
             }`}
@@ -51,13 +51,20 @@ export default function Header() {
             </svg>
             <span>Feldolgozás</span>
           </Link>
-          <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-kavosz-text-secondary bg-transparent hover:bg-kavosz-teal-light/50 rounded-md transition-colors">
+          <Link
+            href="/search"
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${
+              pathname === '/search'
+                ? 'text-kavosz-teal-primary bg-kavosz-teal-light'
+                : 'text-kavosz-text-secondary bg-transparent hover:bg-kavosz-teal-light/50'
+            }`}
+          >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8"/>
               <path d="M21 21l-4.35-4.35"/>
             </svg>
             <span>Keresés</span>
-          </button>
+          </Link>
         </nav>
 
         {/* User Menu */}

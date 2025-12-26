@@ -9,6 +9,8 @@ interface UploadedDoc {
   status: 'pending' | 'uploading' | 'processing' | 'complete' | 'error'
   result?: any
   error?: string
+  documentId?: string
+  showJson?: boolean
 }
 
 export default function UploadPage() {
@@ -93,7 +95,7 @@ export default function UploadPage() {
 
       if (extractRes.ok) {
         setDocuments(prev => prev.map((d, i) =>
-          i === index ? { ...d, status: 'complete', result: extractData } : d
+          i === index ? { ...d, status: 'complete', result: extractData, documentId: uploadData.document.id } : d
         ))
       } else {
         throw new Error(extractData.error)
@@ -338,17 +340,34 @@ export default function UploadPage() {
 
                 {/* Actions */}
                 <div className="flex gap-2 pt-5 border-t border-kavosz-border">
-                  <button className="px-6 py-3 text-sm font-medium text-white bg-kavosz-teal-primary hover:bg-kavosz-teal-hover rounded-lg transition-colors">
-                    Részletek
+                  <button
+                    onClick={() => {
+                      setDocuments(prev => prev.map((d, idx) =>
+                        idx === i ? { ...d, showJson: !d.showJson } : d
+                      ))
+                    }}
+                    className="px-6 py-3 text-sm font-medium text-white bg-kavosz-teal-primary hover:bg-kavosz-teal-hover rounded-lg transition-colors"
+                  >
+                    {doc.showJson ? 'Mezők mutatása' : 'Részletek (JSON)'}
                   </button>
-                  <button className="flex items-center gap-1.5 px-6 py-3 text-sm font-medium text-kavosz-teal-primary bg-transparent hover:bg-kavosz-teal-light rounded-lg transition-colors">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                    </svg>
-                    Duplikáció
-                  </button>
-                  <button className="flex items-center gap-1.5 px-6 py-3 text-sm font-medium text-red-500 bg-transparent hover:bg-red-50 rounded-lg transition-colors">
+                  <button
+                    onClick={async () => {
+                      if (!doc.documentId || !confirm('Biztosan törölni szeretné ezt a dokumentumot?')) return
+
+                      try {
+                        const res = await fetch(`/api/documents/${doc.documentId}`, { method: 'DELETE' })
+                        if (res.ok) {
+                          setDocuments(prev => prev.filter((_, idx) => idx !== i))
+                        } else {
+                          alert('Hiba történt a törlés során')
+                        }
+                      } catch (error) {
+                        console.error('Delete error:', error)
+                        alert('Hiba történt a törlés során')
+                      }
+                    }}
+                    className="flex items-center gap-1.5 px-6 py-3 text-sm font-medium text-red-500 bg-transparent hover:bg-red-50 rounded-lg transition-colors"
+                  >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <polyline points="3,6 5,6 21,6"/>
                       <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -356,6 +375,16 @@ export default function UploadPage() {
                     Ügylet törlése
                   </button>
                 </div>
+
+                {/* JSON View */}
+                {doc.showJson && (
+                  <div className="mt-6 pt-6 border-t border-kavosz-border">
+                    <h4 className="text-sm font-semibold text-kavosz-text-primary mb-3">JSON Részletek</h4>
+                    <pre className="bg-gray-50 border border-kavosz-border rounded-lg p-4 text-xs overflow-auto max-h-96">
+                      {JSON.stringify(doc.result, null, 2)}
+                    </pre>
+                  </div>
+                )}
               </div>
             )
           })}
