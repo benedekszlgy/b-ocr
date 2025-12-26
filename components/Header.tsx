@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@/lib/translations'
 
 export default function Header() {
   const pathname = usePathname()
@@ -62,7 +63,7 @@ export default function Header() {
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
               <polyline points="9,22 9,12 15,12 15,22"/>
             </svg>
-            <span>Dashboard</span>
+            <span>{t('header.dashboard', language)}</span>
           </Link>
           <Link
             href="/upload"
@@ -76,7 +77,7 @@ export default function Header() {
               <line x1="12" y1="5" x2="12" y2="19"/>
               <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
-            <span>Új dokumentum</span>
+            <span>{t('header.newDocument', language)}</span>
           </Link>
           <Link
             href="/search"
@@ -90,7 +91,7 @@ export default function Header() {
               <circle cx="11" cy="11" r="8"/>
               <path d="M21 21l-4.35-4.35"/>
             </svg>
-            <span>Keresés</span>
+            <span>{t('header.search', language)}</span>
           </Link>
         </nav>
 
@@ -118,13 +119,13 @@ export default function Header() {
           {showUserMenu && (
             <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-kavosz-border z-50">
               <div className="p-3 border-b border-kavosz-border">
-                <p className="text-xs text-kavosz-text-muted">Bejelentkezve:</p>
+                <p className="text-xs text-kavosz-text-muted">{t('header.loggedInAs', language)}</p>
                 <p className="text-sm font-medium text-kavosz-text-primary truncate">{userEmail}</p>
               </div>
 
               {/* Language Switcher */}
               <div className="p-2 border-b border-kavosz-border">
-                <p className="text-xs text-kavosz-text-muted px-2 mb-1.5">Nyelv / Language</p>
+                <p className="text-xs text-kavosz-text-muted px-2 mb-1.5">{t('header.language', language)}</p>
                 <div className="flex gap-1">
                   <button
                     onClick={() => setLanguage('hu')}
@@ -158,7 +159,7 @@ export default function Header() {
                   <polyline points="16 17 21 12 16 7"/>
                   <line x1="21" y1="12" x2="9" y2="12"/>
                 </svg>
-                Kijelentkezés
+                {t('header.logout', language)}
               </button>
             </div>
           )}

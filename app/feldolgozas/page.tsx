@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { translateFieldName, translateDocumentType } from '@/lib/translations'
+import { translateFieldName, translateDocumentType, t } from '@/lib/translations'
 
 interface Field {
   fieldName: string
@@ -134,7 +134,7 @@ function FeldolgozasContent() {
               <div className="flex items-center gap-2 px-3.5 py-2 bg-kavosz-teal-light rounded-full">
                 <div className="w-2 h-2 bg-kavosz-teal-primary rounded-full" />
                 <span className="text-[13px] font-medium text-kavosz-teal-primary">
-                  Feldolgozás kész
+                  {t('documentDetails.processingComplete', language)}
                 </span>
               </div>
             </div>
@@ -142,13 +142,13 @@ function FeldolgozasContent() {
             {/* Meta */}
             <div className="flex gap-8 pb-5 mb-6 border-b border-kavosz-border">
               <div className="flex gap-2">
-                <span className="text-sm text-kavosz-text-muted">Dokumentum típusa:</span>
+                <span className="text-sm text-kavosz-text-muted">{t('documentDetails.documentType', language)}</span>
                 <span className="text-sm font-medium text-kavosz-text-primary">
                   {translateDocumentType(document.doc_type || 'UNKNOWN', language)}
                 </span>
               </div>
               <div className="flex gap-2">
-                <span className="text-sm text-kavosz-text-muted">Megbízhatóság:</span>
+                <span className="text-sm text-kavosz-text-muted">{t('documentDetails.confidence', language)}</span>
                 <span className="text-sm font-medium text-kavosz-text-primary">
                   {document.doc_type_confidence ? (document.doc_type_confidence * 100).toFixed(0) : '0'}%
                 </span>
@@ -158,7 +158,7 @@ function FeldolgozasContent() {
             {/* Fields */}
             {document.extractedFields && document.extractedFields.length > 0 && (
               <div className="mb-6">
-                <h4 className="text-sm font-semibold text-kavosz-text-primary mb-4">Kinyert adatok</h4>
+                <h4 className="text-sm font-semibold text-kavosz-text-primary mb-4">{t('documentDetails.extractedData', language)}</h4>
                 <div className="grid grid-cols-2 gap-4">
                   {document.extractedFields.map((field, idx) => (
                     <div key={idx}>
