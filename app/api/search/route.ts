@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
         id,
         filename,
         ocr_text,
+        status,
         extracted_fields (
           field_key,
           field_value
@@ -31,22 +32,60 @@ export async function POST(request: NextRequest) {
         applications!inner(user_id)
       `)
       .eq('applications.user_id', user.id)
-      .eq('status', 'completed')
 
     if (error) {
       console.error('Database error:', error)
       return NextResponse.json({ error: 'Failed to search documents' }, { status: 500 })
     }
 
+    console.log('Search found documents:', documents?.length || 0)
+    console.log('Document statuses:', documents?.map(d => ({ id: d.id, status: d.status, hasOCR: !!d.ocr_text })))
+
     if (!documents || documents.length === 0) {
-      return NextResponse.json({ results: [] })
+      return NextResponse.json({ results: [], debug: 'Nincs feltöltött dokumentum. Töltsön fel dokumentumokat először!' })
+    }
+
+    // Count documents by status
+    const statusCounts = documents.reduce((acc, d) => {
+      acc[d.status] = (acc[d.status] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
+
+    // Filter only completed documents with OCR text
+    const completedDocs = documents.filter(d => d.status === 'completed' && d.ocr_text)
+    const completedButNoOCR = documents.filter(d => d.status === 'completed' && !d.ocr_text)
+
+    if (completedDocs.length === 0) {
+      const statusMsg = Object.entries(statusCounts)
+        .map(([status, count]) => `${count} ${status}`)
+        .join(', ')
+
+      let debugMsg = `${documents.length} dokumentum található (${statusMsg})`
+
+      if (completedButNoOCR.length > 0) {
+        debugMsg += `. ${completedButNoOCR.length} completed dokumentumnak nincs OCR szövege!`
+      }
+
+      if (statusCounts.pending > 0) {
+        debugMsg += `. ${statusCounts.pending} dokumentum feldolgozásra vár - nyissa meg őket a Dashboard-on!`
+      }
+
+      if (statusCounts.error > 0) {
+        debugMsg += `. ${statusCounts.error} dokumentum hibával fejeződött be.`
+      }
+
+      return NextResponse.json({
+        results: [],
+        debug: debugMsg,
+        statuses: documents.map(d => d.status)
+      })
     }
 
     // Simple text-based search with relevance scoring
     const searchTerm = query.toLowerCase()
     const results: any[] = []
 
-    for (const doc of documents) {
+    for (const doc of completedDocs) {
       let score = 0
       let excerpt = ''
 

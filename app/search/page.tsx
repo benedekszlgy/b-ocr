@@ -17,6 +17,7 @@ export default function SearchPage() {
   const [results, setResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
+  const [debugInfo, setDebugInfo] = useState<string>('')
 
   const handleSearch = async () => {
     if (!query.trim()) return
@@ -34,8 +35,14 @@ export default function SearchPage() {
       if (res.ok) {
         const data = await res.json()
         setResults(data.results || [])
+        if (data.debug) {
+          setDebugInfo(data.debug + (data.statuses ? ` - Statuses: ${data.statuses.join(', ')}` : ''))
+        } else {
+          setDebugInfo('')
+        }
       } else {
         setResults([])
+        setDebugInfo('Error fetching results')
       }
     } catch (error) {
       console.error('Search error:', error)
@@ -57,9 +64,18 @@ export default function SearchPage() {
 
       <main className="pb-12">
         <div className="max-w-[960px] mx-auto px-6 py-8">
-          <h1 className="text-[28px] font-light text-kavosz-teal-primary mb-2">
-            Dokumentum keresés
-          </h1>
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-[28px] font-light text-kavosz-teal-primary">
+              Dokumentum keresés
+            </h1>
+            <a
+              href="/api/debug-docs"
+              target="_blank"
+              className="text-xs px-3 py-1.5 bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors"
+            >
+              Debug Info
+            </a>
+          </div>
           <p className="text-sm text-kavosz-text-muted mb-6">
             Keressen a feldolgozott dokumentumok tartalmában
           </p>
@@ -114,9 +130,14 @@ export default function SearchPage() {
               <h3 className="text-lg font-semibold text-kavosz-text-primary mb-2">
                 Nincs találat
               </h3>
-              <p className="text-sm text-kavosz-text-muted">
+              <p className="text-sm text-kavosz-text-muted mb-2">
                 Próbáljon más kulcsszavakkal keresni
               </p>
+              {debugInfo && (
+                <p className="text-xs text-red-600 mt-4 font-mono">
+                  Debug: {debugInfo}
+                </p>
+              )}
             </div>
           ) : results.length > 0 ? (
             <div className="space-y-4">
