@@ -2,6 +2,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { classifyDocument, extractFields } from '@/lib/extraction/openai'
+import { chunkByStructure } from '@/lib/rag/chunking'
+import { generateEmbeddingsBatched } from '@/lib/rag/embeddings'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
@@ -138,6 +140,40 @@ export async function POST(request: NextRequest) {
       }))
 
       await supabase.from('extracted_fields').insert(fieldRecords)
+    }
+
+    // Generate embeddings for RAG pipeline
+    try {
+      // Chunk the OCR text
+      const chunks = chunkByStructure(ocrText, 1000)
+
+      if (chunks.length > 0) {
+        // Generate embeddings for all chunks
+        const embeddings = await generateEmbeddingsBatched(
+          chunks.map(c => c.text),
+          50 // Batch size
+        )
+
+        // Store chunks with embeddings
+        const chunkRecords = chunks.map((chunk, idx) => ({
+          document_id: documentId,
+          chunk_text: chunk.text,
+          chunk_index: chunk.index,
+          embedding: JSON.stringify(embeddings[idx])
+        }))
+
+        const { error: chunkError } = await supabase
+          .from('document_chunks')
+          .insert(chunkRecords)
+
+        if (chunkError) {
+          console.error('Error storing chunks:', chunkError)
+          // Don't fail the whole request if chunk storage fails
+        }
+      }
+    } catch (embeddingError) {
+      console.error('Error generating embeddings:', embeddingError)
+      // Don't fail the whole request if embedding generation fails
     }
 
     return NextResponse.json({
