@@ -1,7 +1,6 @@
 // API route for OCR and AI extraction
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
-import { extractTextFromImage } from '@/lib/ocr/tesseract'
 import { classifyDocument, extractFields } from '@/lib/extraction/openai'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -56,8 +55,31 @@ export async function POST(request: NextRequest) {
       throw new Error('Failed to get file URL')
     }
 
-    // Perform OCR
-    const ocrText = await extractTextFromImage(urlData.signedUrl)
+    // Use OpenAI Vision to extract text from image
+    const OpenAI = (await import('openai')).default
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+
+    const visionResponse = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'text',
+              text: 'Extract all text from this document image. Return only the raw text content, preserving the layout as much as possible.',
+            },
+            {
+              type: 'image_url',
+              image_url: { url: urlData.signedUrl },
+            },
+          ],
+        },
+      ],
+      max_tokens: 4096,
+    })
+
+    const ocrText = visionResponse.choices[0]?.message?.content || ''
 
     if (!ocrText || ocrText.trim().length === 0) {
       throw new Error('No text extracted from document')
