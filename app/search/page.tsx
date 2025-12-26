@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 
 interface SearchResult {
@@ -11,6 +12,7 @@ interface SearchResult {
 }
 
 export default function SearchPage() {
+  const router = useRouter()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(false)
@@ -124,7 +126,7 @@ export default function SearchPage() {
               {results.map((result, index) => (
                 <div
                   key={index}
-                  onClick={() => window.location.href = `/feldolgozas?docId=${result.documentId}`}
+                  onClick={() => router.push(`/feldolgozas?docId=${result.documentId}`)}
                   className="bg-white rounded-xl p-5 shadow-kavosz border border-kavosz-border hover:shadow-md transition-shadow cursor-pointer"
                 >
                   <div className="flex items-start justify-between mb-2">

@@ -241,9 +241,9 @@ export default function UploadPage() {
   }
 
   if (currentStep === 'upload') {
-    const completed = documents.filter(d => d.status === 'complete').length
+    const completed = documents.filter(d => d.status === 'complete' || d.status === 'error').length
     const total = documents.length
-    const progress = (completed / total) * 100
+    const progress = total > 0 ? (completed / total) * 100 : 0
 
     return (
       <div className="min-h-screen bg-kavosz-bg">
@@ -252,16 +252,53 @@ export default function UploadPage() {
         <main className="pb-12">
           <div className="max-w-[960px] mx-auto px-6 py-8">
             <div className="bg-white rounded-xl p-7 shadow-kavosz border border-kavosz-border">
-              <div className="text-center mb-6">
-                <div className="h-1 bg-kavosz-border rounded-sm overflow-hidden mb-3">
-                  <div
-                    className="h-full bg-kavosz-teal-primary transition-all duration-300"
-                    style={{ width: `${progress}%`, animation: progress < 100 ? 'progress 1.5s ease-in-out infinite' : 'none' }}
-                  />
+              <div className="mb-6">
+                <div className="text-center mb-4">
+                  <div className="h-1 bg-kavosz-border rounded-sm overflow-hidden mb-3">
+                    <div
+                      className="h-full bg-kavosz-teal-primary transition-all duration-300"
+                      style={{ width: `${progress}%`, animation: progress < 100 ? 'progress 1.5s ease-in-out infinite' : 'none' }}
+                    />
+                  </div>
+                  <p className="text-sm text-kavosz-text-muted">
+                    Dokumentumok elemzése folyamatban... ({completed}/{total})
+                  </p>
                 </div>
-                <p className="text-sm text-kavosz-text-muted">
-                  Dokumentumok elemzése folyamatban...
-                </p>
+
+                {/* Document processing list */}
+                <div className="space-y-3 mt-6">
+                  {documents.map((doc, i) => (
+                    <div key={i} className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg border border-kavosz-border">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="flex-shrink-0">
+                          {doc.status === 'complete' ? (
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d9488" strokeWidth="2">
+                              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                              <polyline points="22,4 12,14.01 9,11.01"/>
+                            </svg>
+                          ) : doc.status === 'error' ? (
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
+                              <circle cx="12" cy="12" r="10"/>
+                              <line x1="12" y1="8" x2="12" y2="12"/>
+                              <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                          ) : (
+                            <div className="animate-spin h-5 w-5 border-2 border-kavosz-teal-primary border-t-transparent rounded-full" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-kavosz-text-primary truncate">{doc.file.name}</p>
+                          <p className="text-xs text-kavosz-text-muted">
+                            {doc.status === 'uploading' && 'Feltöltés...'}
+                            {doc.status === 'processing' && 'Feldolgozás...'}
+                            {doc.status === 'complete' && 'Kész'}
+                            {doc.status === 'error' && 'Hiba'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
