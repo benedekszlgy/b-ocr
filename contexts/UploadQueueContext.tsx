@@ -72,13 +72,10 @@ export function UploadQueueProvider({ children }: { children: React.ReactNode })
     const processQueue = async () => {
       if (processingRef.current) return
 
-      // Check if there are actually pending items
-      if (pendingCountRef.current === 0) return
-
       processingRef.current = true
 
       try {
-        while (isMounted && pendingCountRef.current > 0) {
+        while (isMounted) {
           // Get current queue state
           let nextDoc: QueuedDocument | undefined
 
