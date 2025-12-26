@@ -5,10 +5,17 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
 
-    // Fetch all documents ordered by creation date
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Fetch only user's documents ordered by creation date
     const { data: documents, error } = await supabase
       .from('documents')
       .select('*')
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false })
 
     if (error) {

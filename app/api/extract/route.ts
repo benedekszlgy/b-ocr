@@ -13,10 +13,9 @@ export async function POST(request: NextRequest) {
     data: { user },
   } = await authClient.auth.getUser()
 
-  // For testing: allow unauthenticated access
-  // In production, you should enforce authentication
+  // Require authentication
   if (!user) {
-    console.warn('Extraction called without authentication - using test mode')
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const { documentId } = await request.json()

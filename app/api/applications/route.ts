@@ -46,9 +46,12 @@ export async function POST(request: NextRequest) {
     data: { user },
   } = await authClient.auth.getUser()
 
-  // For testing: use null if no user is logged in
-  // In production, you should enforce authentication
-  const userId = user?.id || null
+  // Require authentication
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const userId = user.id
 
   const body = await request.json()
 

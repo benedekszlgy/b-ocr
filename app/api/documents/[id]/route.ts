@@ -9,11 +9,18 @@ export async function GET(
     const { id } = await context.params
     const supabase = await createClient()
 
-    // Fetch document with fields
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Fetch document with fields (user ownership check)
     const { data: document, error: docError } = await supabase
       .from('documents')
       .select('*')
       .eq('id', id)
+      .eq('user_id', user.id)
       .single()
 
     if (docError) {
@@ -57,17 +64,24 @@ export async function DELETE(
     const { id } = await context.params
     const supabase = await createClient()
 
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     // Delete extracted fields first (foreign key constraint)
     await supabase
       .from('extracted_fields')
       .delete()
       .eq('document_id', id)
 
-    // Delete the document
+    // Delete the document (with user ownership check)
     const { error } = await supabase
       .from('documents')
       .delete()
       .eq('id', id)
+      .eq('user_id', user.id)
 
     if (error) {
       console.error('Delete error:', error)

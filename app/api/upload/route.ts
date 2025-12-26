@@ -12,8 +12,12 @@ export async function POST(request: NextRequest) {
     data: { user },
   } = await authClient.auth.getUser()
 
-  // For testing: use null if no user is logged in
-  const userId = user?.id || null
+  // Require authentication
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const userId = user.id
 
   const formData = await request.formData()
   const file = formData.get('file') as File

@@ -11,7 +11,13 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient()
 
-    // Fetch all documents with their OCR text and extracted fields
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Fetch only user's documents with their OCR text and extracted fields
     const { data: documents, error } = await supabase
       .from('documents')
       .select(`
@@ -23,6 +29,7 @@ export async function POST(request: NextRequest) {
           field_value
         )
       `)
+      .eq('user_id', user.id)
       .eq('status', 'completed')
 
     if (error) {
