@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Fetch only user's documents with their OCR text and extracted fields
+    // Fetch only user's documents with their OCR text and extracted fields (join via applications)
     const { data: documents, error } = await supabase
       .from('documents')
       .select(`
@@ -27,9 +27,10 @@ export async function POST(request: NextRequest) {
         extracted_fields (
           field_key,
           field_value
-        )
+        ),
+        applications!inner(user_id)
       `)
-      .eq('user_id', user.id)
+      .eq('applications.user_id', user.id)
       .eq('status', 'completed')
 
     if (error) {

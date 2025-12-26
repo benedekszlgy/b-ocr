@@ -48,11 +48,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: uploadError.message }, { status: 500 })
   }
 
-  // Create document record
+  // Create document record (user_id is not in documents table, only application_id)
   const { data: doc, error: docError } = await supabase
     .from('documents')
     .insert({
-      user_id: userId,
       application_id: applicationId,
       filename: file.name,
       file_path: uploadData.path,

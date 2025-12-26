@@ -15,12 +15,15 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Fetch document with fields (user ownership check)
+    // Fetch document with fields (user ownership check via applications join)
     const { data: document, error: docError } = await supabase
       .from('documents')
-      .select('*')
+      .select(`
+        *,
+        applications!inner(user_id)
+      `)
       .eq('id', id)
-      .eq('user_id', user.id)
+      .eq('applications.user_id', user.id)
       .single()
 
     if (docError) {
@@ -76,12 +79,26 @@ export async function DELETE(
       .delete()
       .eq('document_id', id)
 
-    // Delete the document (with user ownership check)
+    // Verify ownership via applications join before delete
+    const { data: doc } = await supabase
+      .from('documents')
+      .select(`
+        id,
+        applications!inner(user_id)
+      `)
+      .eq('id', id)
+      .eq('applications.user_id', user.id)
+      .single()
+
+    if (!doc) {
+      return NextResponse.json({ error: 'Document not found or access denied' }, { status: 404 })
+    }
+
+    // Delete the document
     const { error } = await supabase
       .from('documents')
       .delete()
       .eq('id', id)
-      .eq('user_id', user.id)
 
     if (error) {
       console.error('Delete error:', error)

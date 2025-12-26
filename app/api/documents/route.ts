@@ -11,11 +11,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Fetch only user's documents ordered by creation date
+    // Fetch only user's documents by joining with applications
     const { data: documents, error } = await supabase
       .from('documents')
-      .select('*')
-      .eq('user_id', user.id)
+      .select(`
+        *,
+        applications!inner(user_id)
+      `)
+      .eq('applications.user_id', user.id)
       .order('created_at', { ascending: false })
 
     if (error) {
