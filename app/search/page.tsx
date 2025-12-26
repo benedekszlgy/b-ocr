@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@/lib/translations'
 
 interface SearchResult {
   documentId: string
@@ -13,6 +15,7 @@ interface SearchResult {
 
 export default function SearchPage() {
   const router = useRouter()
+  const { language } = useLanguage()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(false)
@@ -66,10 +69,10 @@ export default function SearchPage() {
         <div className="max-w-[960px] mx-auto px-6 py-8">
           <div className="flex items-center justify-between mb-2">
             <h1 className="text-[28px] font-light text-kavosz-teal-primary">
-              Dokumentum keresés
+              {t('search.title', language)}
             </h1>
             <a
-              href="/api/debug-docs"
+              href="/api/debug-rag"
               target="_blank"
               className="text-xs px-3 py-1.5 bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors"
             >
@@ -77,7 +80,7 @@ export default function SearchPage() {
             </a>
           </div>
           <p className="text-sm text-kavosz-text-muted mb-6">
-            Keressen a feldolgozott dokumentumok tartalmában
+            {t('search.subtitle', language)}
           </p>
 
           {/* Search Input */}
@@ -89,7 +92,7 @@ export default function SearchPage() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Keressen számla számra, ügyfél névre, összegre..."
+                  placeholder={t('search.placeholder', language)}
                   className="w-full px-4 py-3 pr-12 text-sm text-kavosz-text-primary bg-white border border-kavosz-border rounded-lg outline-none focus:border-kavosz-teal-primary transition-colors"
                 />
                 <svg
@@ -110,7 +113,7 @@ export default function SearchPage() {
                 disabled={loading || !query.trim()}
                 className="px-8 py-3 text-sm font-medium text-white bg-kavosz-teal-primary hover:bg-kavosz-teal-hover rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {loading ? 'Keresés...' : 'Keresés'}
+                {loading ? t('search.searching', language) : t('search.searchButton', language)}
               </button>
             </div>
           </div>
@@ -119,7 +122,7 @@ export default function SearchPage() {
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin h-8 w-8 border-4 border-kavosz-teal-primary border-t-transparent rounded-full" />
-              <p className="text-kavosz-text-muted mt-4">Keresés folyamatban...</p>
+              <p className="text-kavosz-text-muted mt-4">{t('search.searching', language)}</p>
             </div>
           ) : searched && results.length === 0 ? (
             <div className="bg-white rounded-xl p-12 shadow-kavosz border border-kavosz-border text-center">
@@ -128,10 +131,10 @@ export default function SearchPage() {
                 <path d="M21 21l-4.35-4.35"/>
               </svg>
               <h3 className="text-lg font-semibold text-kavosz-text-primary mb-2">
-                Nincs találat
+                {t('search.noResults', language)}
               </h3>
               <p className="text-sm text-kavosz-text-muted mb-2">
-                Próbáljon más kulcsszavakkal keresni
+                {t('search.noResultsDesc', language)}
               </p>
               {debugInfo && (
                 <p className="text-xs text-red-600 mt-4 font-mono">
@@ -142,7 +145,7 @@ export default function SearchPage() {
           ) : results.length > 0 ? (
             <div className="space-y-4">
               <p className="text-sm text-kavosz-text-muted">
-                {results.length} találat
+                {results.length} {t('search.resultsCount', language)}
               </p>
               {results.map((result, index) => (
                 <div
@@ -155,7 +158,7 @@ export default function SearchPage() {
                       {result.documentName}
                     </h3>
                     <span className="text-xs px-2 py-1 bg-kavosz-teal-light text-kavosz-teal-primary rounded-full">
-                      {(result.relevance * 100).toFixed(0)}% relevancia
+                      {(result.relevance * 100).toFixed(0)}% {t('search.relevance', language)}
                     </span>
                   </div>
                   <p className="text-sm text-kavosz-text-muted leading-relaxed">
@@ -171,10 +174,10 @@ export default function SearchPage() {
                 <path d="M21 21l-4.35-4.35"/>
               </svg>
               <h3 className="text-lg font-semibold text-kavosz-text-primary mb-2">
-                Kezdjen el gépelni a kereséshez
+                {t('search.startTyping', language)}
               </h3>
               <p className="text-sm text-kavosz-text-muted">
-                Használja a keresőmezőt dokumentumok tartalmának keresésére
+                {t('search.startTypingDesc', language)}
               </p>
             </div>
           ) : null}

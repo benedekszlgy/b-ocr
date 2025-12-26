@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
       // Fall back to keyword search if vector search fails
       return NextResponse.json({
         results: [],
-        debug: 'Vector search failed, please try again'
+        debug: `Vector search failed: ${searchError.message || JSON.stringify(searchError)}`
       })
     }
 
