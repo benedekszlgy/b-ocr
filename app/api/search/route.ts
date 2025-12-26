@@ -83,14 +83,18 @@ export async function POST(request: NextRequest) {
     console.log('[RAG Search] Searching in', docIds.length, 'completed documents')
 
     // Check if we have any chunks
-    const { data: chunkCount } = await supabase
+    const { count: chunkCount, error: countError } = await supabase
       .from('document_chunks')
-      .select('id', { count: 'exact', head: true })
+      .select('*', { count: 'exact', head: true })
       .in('document_id', docIds)
 
-    console.log('[RAG Search] Found', chunkCount?.length || 0, 'chunks')
+    console.log('[RAG Search] Found', chunkCount || 0, 'chunks')
 
-    if (!chunkCount || chunkCount.length === 0) {
+    if (countError) {
+      console.error('[RAG Search] Error counting chunks:', countError)
+    }
+
+    if (!chunkCount || chunkCount === 0) {
       return NextResponse.json({
         results: [],
         debug: 'A dokumentumokhoz még nincsenek indexelve részletek. Próbálja meg később!'
