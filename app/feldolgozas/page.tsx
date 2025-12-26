@@ -12,10 +12,10 @@ interface Field {
 
 interface DocumentData {
   id: string
-  file_name: string
+  filename: string
   file_path: string
-  document_type: string | null
-  classification_confidence: number | null
+  doc_type: string | null
+  doc_type_confidence: number | null
   extractedFields: Field[]
   created_at: string
 }
@@ -122,7 +122,7 @@ function FeldolgozasContent() {
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h3 className="text-lg font-semibold text-kavosz-text-primary mb-1">
-                  {document.file_name}
+                  {document.filename}
                 </h3>
                 <p className="text-sm text-kavosz-text-muted">
                   Feltöltve: {new Date(document.created_at).toLocaleDateString('hu-HU')}
@@ -141,13 +141,13 @@ function FeldolgozasContent() {
               <div className="flex gap-2">
                 <span className="text-sm text-kavosz-text-muted">Dokumentum típusa:</span>
                 <span className="text-sm font-medium text-kavosz-text-primary">
-                  {document.document_type?.replace('_', ' ') || 'UNKNOWN'}
+                  {document.doc_type?.replace('_', ' ') || 'UNKNOWN'}
                 </span>
               </div>
               <div className="flex gap-2">
                 <span className="text-sm text-kavosz-text-muted">Megbízhatóság:</span>
                 <span className="text-sm font-medium text-kavosz-text-primary">
-                  {document.classification_confidence ? (document.classification_confidence * 100).toFixed(0) : '0'}%
+                  {document.doc_type_confidence ? (document.doc_type_confidence * 100).toFixed(0) : '0'}%
                 </span>
               </div>
             </div>

@@ -54,10 +54,10 @@ export async function POST(request: NextRequest) {
     .insert({
       user_id: userId,
       application_id: applicationId,
-      file_name: file.name,
+      filename: file.name,
       file_path: uploadData.path,
       file_size: file.size,
-      file_type: file.type,
+      mime_type: file.type,
       status: 'pending',
     })
     .select()

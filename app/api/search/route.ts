@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       .from('documents')
       .select(`
         id,
-        file_name,
+        filename,
         ocr_text,
         extracted_fields (
           field_key,
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
       if (score > 0) {
         results.push({
           documentId: doc.id,
-          documentName: doc.file_name,
+          documentName: doc.filename,
           excerpt: excerpt || 'No excerpt available',
           relevance: Math.min(score / 10, 1) // Normalize to 0-1
         })

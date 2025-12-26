@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     let ocrText = ''
 
     // Check if file is PDF or image
-    const isPDF = doc.file_type === 'application/pdf' || doc.file_name.toLowerCase().endsWith('.pdf')
+    const isPDF = doc.mime_type === 'application/pdf' || doc.filename.toLowerCase().endsWith('.pdf')
 
     if (isPDF) {
       // Handle PDF files

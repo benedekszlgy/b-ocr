@@ -6,12 +6,12 @@ import Header from '@/components/Header'
 
 interface Document {
   id: string
-  file_name: string
+  filename: string
   file_path: string
-  file_type: string
+  mime_type: string
   file_size: number
-  document_type: string | null
-  classification_confidence: number | null
+  doc_type: string | null
+  doc_type_confidence: number | null
   created_at: string
 }
 
@@ -123,7 +123,7 @@ export default function DashboardPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="text-base font-semibold text-kavosz-text-primary mb-1 truncate">
-                          {doc.file_name}
+                          {doc.filename}
                         </h3>
                         <div className="flex items-center gap-4 text-sm text-kavosz-text-muted">
                           <span>{formatFileSize(doc.file_size)}</span>
@@ -132,16 +132,16 @@ export default function DashboardPage() {
                         </div>
                       </div>
                     </div>
-                    {doc.document_type && (
+                    {doc.doc_type && (
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-kavosz-teal-light rounded-full">
                           <span className="text-sm font-medium text-kavosz-teal-primary">
-                            {doc.document_type.replace('_', ' ')}
+                            {doc.doc_type.replace('_', ' ')}
                           </span>
                         </div>
-                        {doc.classification_confidence && (
+                        {doc.doc_type_confidence && (
                           <span className="text-sm text-kavosz-text-muted">
-                            {(doc.classification_confidence * 100).toFixed(0)}%
+                            {(doc.doc_type_confidence * 100).toFixed(0)}%
                           </span>
                         )}
                       </div>
