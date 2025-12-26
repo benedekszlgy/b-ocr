@@ -81,27 +81,41 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Simple text-based search with relevance scoring
-    const searchTerm = query.toLowerCase()
+    // Tokenize search query - split into words and filter out short/common words
+    const searchTermLower = query.toLowerCase()
+    const stopWords = ['a', 'az', 'volt', 'van', 'mi', 'i', 'the', 'is', 'was', 'what']
+    const tokens = searchTermLower
+      .split(/[\s,?.!]+/)
+      .filter(token => token.length > 2 && !stopWords.includes(token))
+
+    console.log('Search tokens:', tokens)
+
     const results: any[] = []
 
     for (const doc of completedDocs) {
       let score = 0
       let excerpt = ''
+      let matchedTokens = new Set<string>()
 
       // Search in OCR text
       if (doc.ocr_text) {
         const text = doc.ocr_text.toLowerCase()
-        if (text.includes(searchTerm)) {
-          // Calculate relevance score based on frequency and position
-          const matches = (text.match(new RegExp(searchTerm, 'g')) || []).length
-          score += matches * 0.5
 
-          // Extract excerpt around the match
-          const index = text.indexOf(searchTerm)
-          const start = Math.max(0, index - 50)
-          const end = Math.min(text.length, index + searchTerm.length + 50)
-          excerpt = doc.ocr_text.substring(start, end).replace(/\n/g, ' ')
+        // Search for each token
+        for (const token of tokens) {
+          if (text.includes(token)) {
+            const matches = (text.match(new RegExp(token, 'g')) || []).length
+            score += matches * 0.5
+            matchedTokens.add(token)
+
+            // Extract excerpt around the first match if we don't have one yet
+            if (!excerpt) {
+              const index = text.indexOf(token)
+              const start = Math.max(0, index - 50)
+              const end = Math.min(text.length, index + token.length + 50)
+              excerpt = doc.ocr_text.substring(start, end).replace(/\n/g, ' ')
+            }
+          }
         }
       }
 
@@ -110,14 +124,24 @@ export async function POST(request: NextRequest) {
         for (const field of doc.extracted_fields) {
           if (field.field_value) {
             const fieldValue = field.field_value.toLowerCase()
-            if (fieldValue.includes(searchTerm)) {
-              score += 2 // Fields are more relevant than raw text
-              if (!excerpt) {
-                excerpt = `${field.field_key}: ${field.field_value}`
+
+            for (const token of tokens) {
+              if (fieldValue.includes(token)) {
+                score += 2 // Fields are more relevant than raw text
+                matchedTokens.add(token)
+
+                if (!excerpt) {
+                  excerpt = `${field.field_key}: ${field.field_value}`
+                }
               }
             }
           }
         }
+      }
+
+      // Bonus score for matching multiple tokens
+      if (matchedTokens.size > 1) {
+        score *= (1 + (matchedTokens.size - 1) * 0.3)
       }
 
       if (score > 0) {
@@ -125,7 +149,8 @@ export async function POST(request: NextRequest) {
           documentId: doc.id,
           documentName: doc.filename,
           excerpt: excerpt || 'No excerpt available',
-          relevance: Math.min(score / 10, 1) // Normalize to 0-1
+          relevance: Math.min(score / 10, 1), // Normalize to 0-1
+          matchedTokens: matchedTokens.size
         })
       }
     }
