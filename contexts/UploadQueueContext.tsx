@@ -28,8 +28,7 @@ const UploadQueueContext = createContext<UploadQueueContextType | undefined>(und
 
 export function UploadQueueProvider({ children }: { children: React.ReactNode }) {
   const [queue, setQueue] = useState<QueuedDocument[]>([])
-  const processingRef = useRef(false)
-  const [processTrigger, setProcessTrigger] = useState(0)
+  const isProcessingRef = useRef(false)
 
   const addToQueue = useCallback((file: File, applicationId: string): string => {
     const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
@@ -41,8 +40,8 @@ export function UploadQueueProvider({ children }: { children: React.ReactNode })
       progress: 0,
       createdAt: Date.now()
     }
+    console.log('[Queue] Adding document to queue:', file.name)
     setQueue(prev => [...prev, queuedDoc])
-    setProcessTrigger(t => t + 1) // Trigger processing
     return id
   }, [])
 
@@ -54,119 +53,114 @@ export function UploadQueueProvider({ children }: { children: React.ReactNode })
     setQueue(prev => prev.filter(doc => doc.status !== 'complete' && doc.status !== 'error'))
   }, [])
 
-  const updateQueueItem = useCallback((id: string, updates: Partial<QueuedDocument>) => {
-    setQueue(prev => prev.map(doc => doc.id === id ? { ...doc, ...updates } : doc))
+  // Process one document
+  const processDocument = useCallback(async (doc: QueuedDocument) => {
+    console.log('[Queue] Starting processing for:', doc.file.name)
+
+    try {
+      // Step 1: Upload
+      console.log('[Queue] Step 1/2: Uploading...')
+      setQueue(prev => prev.map(item =>
+        item.id === doc.id
+          ? { ...item, status: 'uploading' as const, progress: 10 }
+          : item
+      ))
+
+      const formData = new FormData()
+      formData.append('file', doc.file)
+      formData.append('applicationId', doc.applicationId)
+
+      const uploadController = new AbortController()
+      const uploadTimeout = setTimeout(() => uploadController.abort(), 30000)
+
+      const uploadRes = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+        signal: uploadController.signal,
+      }).finally(() => clearTimeout(uploadTimeout))
+
+      const uploadData = await uploadRes.json()
+
+      if (!uploadRes.ok) {
+        throw new Error(uploadData.error || 'Upload failed')
+      }
+
+      console.log('[Queue] Upload successful. Document ID:', uploadData.document.id)
+
+      // Step 2: Extract
+      console.log('[Queue] Step 2/2: Extracting data...')
+      setQueue(prev => prev.map(item =>
+        item.id === doc.id
+          ? { ...item, status: 'processing' as const, progress: 50, documentId: uploadData.document.id }
+          : item
+      ))
+
+      const extractController = new AbortController()
+      const extractTimeout = setTimeout(() => extractController.abort(), 60000)
+
+      const extractRes = await fetch('/api/extract', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ documentId: uploadData.document.id }),
+        signal: extractController.signal,
+      }).finally(() => clearTimeout(extractTimeout))
+
+      const extractData = await extractRes.json()
+
+      if (!extractRes.ok) {
+        throw new Error(extractData.error || 'Extraction failed')
+      }
+
+      console.log('[Queue] Extraction successful!')
+      setQueue(prev => prev.map(item =>
+        item.id === doc.id
+          ? { ...item, status: 'complete' as const, progress: 100, result: extractData }
+          : item
+      ))
+    } catch (error: any) {
+      console.error('[Queue] Error processing document:', error)
+      const errorMessage = error.name === 'AbortError'
+        ? 'Request timeout - please try again'
+        : (error.message || 'Processing failed')
+
+      setQueue(prev => prev.map(item =>
+        item.id === doc.id
+          ? { ...item, status: 'error' as const, progress: 0, error: errorMessage }
+          : item
+      ))
+    }
   }, [])
 
-  // Process queue - runs continuously in background
+  // Simple queue processor - runs whenever queue changes
   useEffect(() => {
-    let isMounted = true
+    const process = async () => {
+      // Prevent concurrent processing
+      if (isProcessingRef.current) {
+        console.log('[Queue] Already processing, skipping...')
+        return
+      }
 
-    const processQueue = async () => {
-      if (processingRef.current) return
+      // Find next pending document
+      const nextDoc = queue.find(doc => doc.status === 'pending')
+      if (!nextDoc) {
+        console.log('[Queue] No pending documents')
+        return
+      }
 
-      processingRef.current = true
+      console.log('[Queue] Found pending document:', nextDoc.file.name)
+      isProcessingRef.current = true
 
       try {
-        while (isMounted) {
-          // Get current queue state
-          let nextDoc: QueuedDocument | undefined
-
-          setQueue(currentQueue => {
-            nextDoc = currentQueue.find(doc => doc.status === 'pending')
-            return currentQueue
-          })
-
-          if (!nextDoc) break
-
-          try {
-            console.log('Starting upload for:', nextDoc.file.name)
-
-            // Update to uploading
-            setQueue(prev => prev.map(doc =>
-              doc.id === nextDoc!.id
-                ? { ...doc, status: 'uploading' as const, progress: 10 }
-                : doc
-            ))
-
-            // Upload file with timeout
-            const formData = new FormData()
-            formData.append('file', nextDoc.file)
-            formData.append('applicationId', nextDoc.applicationId)
-
-            const uploadController = new AbortController()
-            const uploadTimeout = setTimeout(() => uploadController.abort(), 30000) // 30s timeout
-
-            const uploadRes = await fetch('/api/upload', {
-              method: 'POST',
-              body: formData,
-              signal: uploadController.signal,
-            }).finally(() => clearTimeout(uploadTimeout))
-
-            const uploadData = await uploadRes.json()
-
-            if (!uploadRes.ok) {
-              console.error('Upload failed:', uploadData)
-              throw new Error(uploadData.error || 'Upload failed')
-            }
-
-            console.log('Upload successful, starting extraction:', uploadData.document.id)
-
-            // Update to processing
-            setQueue(prev => prev.map(doc =>
-              doc.id === nextDoc!.id
-                ? { ...doc, status: 'processing' as const, progress: 50, documentId: uploadData.document.id }
-                : doc
-            ))
-
-            // Extract data with timeout
-            const extractController = new AbortController()
-            const extractTimeout = setTimeout(() => extractController.abort(), 60000) // 60s timeout
-
-            const extractRes = await fetch('/api/extract', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ documentId: uploadData.document.id }),
-              signal: extractController.signal,
-            }).finally(() => clearTimeout(extractTimeout))
-
-            const extractData = await extractRes.json()
-
-            if (extractRes.ok) {
-              console.log('Extraction successful:', extractData)
-              setQueue(prev => prev.map(doc =>
-                doc.id === nextDoc!.id
-                  ? { ...doc, status: 'complete' as const, progress: 100, result: extractData }
-                  : doc
-              ))
-            } else {
-              console.error('Extraction failed:', extractData)
-              throw new Error(extractData.error || 'Extraction failed')
-            }
-          } catch (error: any) {
-            console.error('Error processing document:', error)
-            const errorMessage = error.name === 'AbortError'
-              ? 'Request timeout - please try again'
-              : (error.message || 'Upload failed')
-
-            setQueue(prev => prev.map(doc =>
-              doc.id === nextDoc!.id
-                ? { ...doc, status: 'error' as const, progress: 0, error: errorMessage }
-                : doc
-            ))
-          }
-        }
+        await processDocument(nextDoc)
       } finally {
-        processingRef.current = false
+        isProcessingRef.current = false
+        // After processing one document, trigger re-check for next one
+        // This happens automatically because processDocument updates queue state
       }
     }
 
-    processQueue()
-
-    return () => {
-      isMounted = false
-    }
-  }, [processTrigger]) // Only trigger when new items added
+    process()
+  }, [queue, processDocument])
 
   const isProcessing = queue.some(doc =>
     doc.status === 'uploading' || doc.status === 'processing' || doc.status === 'pending'
