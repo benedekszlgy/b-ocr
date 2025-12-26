@@ -59,8 +59,8 @@ export default function UploadPage() {
         addToQueue(file, appId)
       })
 
-      // Navigate to dashboard after adding to queue
-      router.push('/dashboard')
+      // Files are added to queue - user can stay or navigate away
+      // Processing continues in background regardless
     }
   })
 
@@ -120,11 +120,18 @@ export default function UploadPage() {
 
           {/* Info message */}
           <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-800">
-              {language === 'hu'
-                ? 'A feltöltött dokumentumok automatikusan feldolgozásra kerülnek a háttérben. Nyugodtan navigálhat más oldalakra, a feldolgozás a jobb alsó sarokban követhető.'
-                : 'Uploaded documents will be processed automatically in the background. Feel free to navigate to other pages, progress can be tracked in the bottom right corner.'}
-            </p>
+            <div className="flex items-start gap-3">
+              <svg className="flex-shrink-0 mt-0.5" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1e40af" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+              <p className="text-sm text-blue-800">
+                {language === 'hu'
+                  ? 'A feltöltött dokumentumok automatikusan feldolgozásra kerülnek a háttérben. Nyugodtan maradhat itt vagy navigálhat más oldalakra - a feldolgozás folytatódik, és a jobb alsó sarokban követhető.'
+                  : 'Uploaded documents will be processed automatically in the background. You can stay here or navigate to other pages - processing continues and can be tracked in the bottom right corner.'}
+              </p>
+            </div>
           </div>
         </div>
       </main>
