@@ -29,6 +29,7 @@ const UploadQueueContext = createContext<UploadQueueContextType | undefined>(und
 export function UploadQueueProvider({ children }: { children: React.ReactNode }) {
   const [queue, setQueue] = useState<QueuedDocument[]>([])
   const processingRef = useRef(false)
+  const [processTrigger, setProcessTrigger] = useState(0)
 
   const addToQueue = useCallback((file: File, applicationId: string): string => {
     const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
@@ -41,6 +42,7 @@ export function UploadQueueProvider({ children }: { children: React.ReactNode })
       createdAt: Date.now()
     }
     setQueue(prev => [...prev, queuedDoc])
+    setProcessTrigger(t => t + 1) // Trigger processing
     return id
   }, [])
 
@@ -140,15 +142,12 @@ export function UploadQueueProvider({ children }: { children: React.ReactNode })
       }
     }
 
-    const hasPending = queue.some(doc => doc.status === 'pending')
-    if (hasPending) {
-      processQueue()
-    }
+    processQueue()
 
     return () => {
       isMounted = false
     }
-  }, [queue.length]) // Only re-run when queue length changes
+  }, [processTrigger]) // Trigger when new items added
 
   const isProcessing = queue.some(doc =>
     doc.status === 'uploading' || doc.status === 'processing' || doc.status === 'pending'
