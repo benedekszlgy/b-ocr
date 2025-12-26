@@ -1,6 +1,20 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  /* KAVOSZ Design System Colors */
+  --color-kavosz-bg: #f7f8fa;
+  --color-kavosz-teal-primary: #0d9488;
+  --color-kavosz-teal-hover: #0f766e;
+  --color-kavosz-teal-light: #e6f7f6;
+  --color-kavosz-border: #e5e7eb;
+  --color-kavosz-text-primary: #111827;
+  --color-kavosz-text-secondary: #374151;
+  --color-kavosz-text-muted: #6b7280;
+  --color-kavosz-text-light: #9ca3af;
+
+  /* Custom shadow */
+  --shadow-kavosz: 0 1px 3px rgba(0,0,0,0.04);
+}
 
 body {
   background: #f7f8fa;
