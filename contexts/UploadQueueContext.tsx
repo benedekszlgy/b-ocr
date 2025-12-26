@@ -30,6 +30,7 @@ export function UploadQueueProvider({ children }: { children: React.ReactNode })
   const [queue, setQueue] = useState<QueuedDocument[]>([])
   const processingRef = useRef(false)
   const [processTrigger, setProcessTrigger] = useState(0)
+  const pendingCountRef = useRef(0)
 
   const addToQueue = useCallback((file: File, applicationId: string): string => {
     const id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
@@ -58,8 +59,16 @@ export function UploadQueueProvider({ children }: { children: React.ReactNode })
     setQueue(prev => prev.map(doc => doc.id === id ? { ...doc, ...updates } : doc))
   }, [])
 
+  // Track pending count
+  useEffect(() => {
+    const pendingCount = queue.filter(doc => doc.status === 'pending').length
+    pendingCountRef.current = pendingCount
+  }, [queue])
+
   // Process queue - runs continuously in background
   useEffect(() => {
+    if (pendingCountRef.current === 0) return
+
     let isMounted = true
 
     const processQueue = async () => {
@@ -68,7 +77,7 @@ export function UploadQueueProvider({ children }: { children: React.ReactNode })
       processingRef.current = true
 
       try {
-        while (isMounted) {
+        while (isMounted && pendingCountRef.current > 0) {
           // Get current queue state
           let nextDoc: QueuedDocument | undefined
 
@@ -147,7 +156,7 @@ export function UploadQueueProvider({ children }: { children: React.ReactNode })
     return () => {
       isMounted = false
     }
-  }, [processTrigger]) // Trigger when new items added
+  }, [processTrigger]) // Only trigger when new items added
 
   const isProcessing = queue.some(doc =>
     doc.status === 'uploading' || doc.status === 'processing' || doc.status === 'pending'
