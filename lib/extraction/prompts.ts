@@ -2,6 +2,7 @@
 import type { DocumentType } from '@/types'
 
 export const DOCUMENT_TYPES: DocumentType[] = [
+  'INVOICE',
   'ID_CARD',
   'BANK_STATEMENT',
   'PAY_STUB',
@@ -12,6 +13,23 @@ export const DOCUMENT_TYPES: DocumentType[] = [
 ]
 
 export const EXTRACTION_PROMPTS: Record<DocumentType, string> = {
+  INVOICE: `Extract these fields from the invoice/receipt OCR text.
+Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": 0.95}]}
+
+Fields to extract:
+- invoice_number
+- invoice_date (YYYY-MM-DD)
+- due_date (YYYY-MM-DD)
+- vendor_name (seller/business name)
+- customer_name (buyer name)
+- subtotal (number only)
+- tax_amount (number only)
+- total_amount (number only)
+- currency
+- payment_terms
+
+Set confidence 0.0-1.0 based on text clarity. Use null if not found.`,
+
   ID_CARD: `Extract these fields from the ID document OCR text.
 Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": 0.95}]}
 

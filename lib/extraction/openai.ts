@@ -18,6 +18,7 @@ export async function classifyDocument(ocrText: string): Promise<{
         {
           role: 'system',
           content: `Classify this document into one of these types:
+- INVOICE (commercial invoice, receipt, bill for goods/services)
 - ID_CARD (driver's license, passport, state ID)
 - BANK_STATEMENT
 - PAY_STUB

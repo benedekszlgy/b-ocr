@@ -57,12 +57,14 @@ export default function HomePage() {
           <div className="mt-16 p-6 bg-blue-50 border border-blue-200 rounded-lg">
             <h3 className="font-semibold text-blue-900 mb-2">📋 Supported Documents</h3>
             <div className="grid md:grid-cols-2 gap-3 text-left mt-3">
+              <div className="text-sm text-blue-800">• Invoices & Receipts</div>
               <div className="text-sm text-blue-800">• ID Cards (Driver License, Passport)</div>
               <div className="text-sm text-blue-800">• Bank Statements</div>
               <div className="text-sm text-blue-800">• Pay Stubs</div>
               <div className="text-sm text-blue-800">• Tax Returns (W-2, 1099)</div>
               <div className="text-sm text-blue-800">• Utility Bills</div>
               <div className="text-sm text-blue-800">• Employment Letters</div>
+              <div className="text-sm text-blue-800">• Financial Documents</div>
             </div>
           </div>
         </div>

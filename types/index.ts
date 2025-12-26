@@ -1,6 +1,7 @@
 // TypeScript types for B-OCR
 
 export type DocumentType =
+  | 'INVOICE'
   | 'ID_CARD'
   | 'BANK_STATEMENT'
   | 'PAY_STUB'
