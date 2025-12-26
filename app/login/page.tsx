@@ -3,9 +3,12 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@/lib/translations'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { language } = useLanguage()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -32,7 +35,7 @@ export default function LoginPage() {
 
         if (error) throw error
 
-        alert('Regisztráció sikeres! Ellenőrizze email fiókját a megerősítéshez.')
+        alert(t('login.signUpSuccess', language))
         setIsSignUp(false)
       } else {
         // Sign in
@@ -47,7 +50,7 @@ export default function LoginPage() {
         router.refresh()
       }
     } catch (error: any) {
-      setError(error.message || 'Hiba történt')
+      setError(error.message || t('login.errorOccurred', language))
     } finally {
       setLoading(false)
     }
@@ -73,12 +76,12 @@ export default function LoginPage() {
             </div>
           </div>
           <h2 className="text-xl font-semibold text-kavosz-text-primary mb-2">
-            {isSignUp ? 'Fiók létrehozása' : 'Bejelentkezés'}
+            {isSignUp ? t('login.signUpTitle', language) : t('login.title', language)}
           </h2>
           <p className="text-sm text-kavosz-text-muted">
             {isSignUp
-              ? 'Regisztráljon a dokumentumok feldolgozásához'
-              : 'Jelentkezzen be a folytatáshoz'}
+              ? t('login.signUpSubtitle', language)
+              : t('login.subtitle', language)}
           </p>
         </div>
 
@@ -93,28 +96,28 @@ export default function LoginPage() {
 
             <div>
               <label className="block text-sm font-semibold text-kavosz-text-primary mb-2">
-                Email cím
+                {t('login.email', language)}
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                placeholder="pelda@email.com"
+                placeholder={t('login.emailPlaceholder', language)}
                 className="w-full px-4 py-3 text-sm text-kavosz-text-primary bg-white border border-kavosz-border rounded-lg outline-none focus:border-kavosz-teal-primary transition-colors"
               />
             </div>
 
             <div>
               <label className="block text-sm font-semibold text-kavosz-text-primary mb-2">
-                Jelszó
+                {t('login.password', language)}
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                placeholder="••••••••"
+                placeholder={t('login.passwordPlaceholder', language)}
                 className="w-full px-4 py-3 text-sm text-kavosz-text-primary bg-white border border-kavosz-border rounded-lg outline-none focus:border-kavosz-teal-primary transition-colors"
               />
             </div>
@@ -124,7 +127,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full px-6 py-3 text-sm font-medium text-white bg-kavosz-teal-primary hover:bg-kavosz-teal-hover rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {loading ? 'Betöltés...' : (isSignUp ? 'Regisztráció' : 'Bejelentkezés')}
+              {loading ? t('login.loading', language) : (isSignUp ? t('login.signUp', language) : t('login.signIn', language))}
             </button>
           </form>
 
@@ -137,8 +140,8 @@ export default function LoginPage() {
               className="text-sm text-kavosz-teal-primary hover:text-kavosz-teal-hover transition-colors"
             >
               {isSignUp
-                ? 'Van már fiókja? Jelentkezzen be'
-                : 'Nincs még fiókja? Regisztráljon'}
+                ? t('login.haveAccount', language)
+                : t('login.noAccount', language)}
             </button>
           </div>
         </div>

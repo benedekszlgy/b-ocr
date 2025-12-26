@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t, translateDocumentType } from '@/lib/translations'
 
 interface Document {
   id: string
@@ -17,6 +19,7 @@ interface Document {
 
 export default function DashboardPage() {
   const router = useRouter()
+  const { language } = useLanguage()
   const [documents, setDocuments] = useState<Document[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -63,10 +66,10 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-[28px] font-light text-kavosz-teal-primary mb-2">
-                Dokumentumok
+                {t('dashboard.title', language)}
               </h1>
               <p className="text-sm text-kavosz-text-muted">
-                {documents.length} dokumentum feldolgozva
+                {documents.length} {t('dashboard.documentsProcessed', language)}
               </p>
             </div>
             <button
@@ -77,14 +80,14 @@ export default function DashboardPage() {
                 <line x1="12" y1="5" x2="12" y2="19"/>
                 <line x1="5" y1="12" x2="19" y2="12"/>
               </svg>
-              Új dokumentum
+              {t('dashboard.newDocument', language)}
             </button>
           </div>
 
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin h-8 w-8 border-4 border-kavosz-teal-primary border-t-transparent rounded-full" />
-              <p className="text-kavosz-text-muted mt-4">Dokumentumok betöltése...</p>
+              <p className="text-kavosz-text-muted mt-4">{t('common.loading', language)}</p>
             </div>
           ) : documents.length === 0 ? (
             <div className="bg-white rounded-xl p-12 shadow-kavosz border border-kavosz-border text-center">
@@ -93,16 +96,16 @@ export default function DashboardPage() {
                 <polyline points="14,2 14,8 20,8"/>
               </svg>
               <h3 className="text-lg font-semibold text-kavosz-text-primary mb-2">
-                Még nincs feltöltött dokumentum
+                {t('dashboard.noDocuments', language)}
               </h3>
               <p className="text-sm text-kavosz-text-muted mb-6">
-                Kezdje el az első dokumentum feltöltésével
+                {t('dashboard.noDocumentsDesc', language)}
               </p>
               <button
                 onClick={() => router.push('/upload')}
                 className="px-6 py-3 text-sm font-medium text-white bg-kavosz-teal-primary hover:bg-kavosz-teal-hover rounded-lg transition-colors"
               >
-                Dokumentum feltöltése
+                {t('dashboard.uploadButton', language)}
               </button>
             </div>
           ) : (
@@ -136,7 +139,7 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-kavosz-teal-light rounded-full">
                           <span className="text-sm font-medium text-kavosz-teal-primary">
-                            {doc.doc_type.replace('_', ' ')}
+                            {translateDocumentType(doc.doc_type, language)}
                           </span>
                         </div>
                         {doc.doc_type_confidence && (

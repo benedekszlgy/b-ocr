@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import Header from '@/components/Header'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t, translateDocumentType, translateFieldName } from '@/lib/translations'
 
 interface UploadedDoc {
   file: File
@@ -14,6 +16,7 @@ interface UploadedDoc {
 }
 
 export default function UploadPage() {
+  const { language } = useLanguage()
   const [appId, setAppId] = useState('')
   const [documents, setDocuments] = useState<UploadedDoc[]>([])
   const [currentStep, setCurrentStep] = useState<'select' | 'upload' | 'results'>('select')
@@ -50,7 +53,7 @@ export default function UploadPage() {
     noKeyboard: false,
     onDrop: (acceptedFiles, rejectedFiles) => {
       if (rejectedFiles.length > 0) {
-        alert(`Nem támogatott fájlformátum. Csak PDF, PNG, JPG és JPEG fájlokat fogadunk el.`)
+        alert(t('upload.unsupportedFormat', language))
         return
       }
 
@@ -143,7 +146,7 @@ export default function UploadPage() {
         <main className="pb-12">
           <div className="max-w-[960px] mx-auto px-6 py-8">
             <h1 className="text-[28px] font-light text-kavosz-teal-primary mb-5">
-              Dokumentumok feltöltése
+              {t('upload.title', language)}
             </h1>
 
             {/* Info Box */}
@@ -156,7 +159,7 @@ export default function UploadPage() {
                 </svg>
               </div>
               <p className="text-sm text-kavosz-teal-primary leading-relaxed">
-                A feltöltött dokumentumok automatikusan feldolgozásra kerülnek. Támogatott formátumok: PDF, PNG, JPG.
+                {t('upload.infoText', language)}
               </p>
             </div>
 
@@ -178,9 +181,9 @@ export default function UploadPage() {
                     </svg>
                   </div>
                   <p className="text-base font-medium text-kavosz-text-secondary mb-1">
-                    Húzza ide a fájlokat vagy kattintson a tallózáshoz
+                    {t('upload.dropzone', language)}
                   </p>
-                  <p className="text-xs text-kavosz-text-light mt-3">Maximum 10MB fájlonként</p>
+                  <p className="text-xs text-kavosz-text-light mt-3">{t('upload.maxFileSize', language)}</p>
                 </div>
               </div>
 
@@ -188,7 +191,7 @@ export default function UploadPage() {
               {documents.length > 0 && (
                 <div className="px-6 py-5 border-t border-kavosz-border">
                   <h3 className="text-sm font-semibold text-kavosz-text-secondary mb-4">
-                    Kiválasztott fájlok ({documents.length})
+                    {t('upload.selectedFiles', language)} ({documents.length})
                   </h3>
                   {documents.map((doc, i) => (
                     <div key={i} className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg mb-2 border border-kavosz-border">
@@ -222,13 +225,13 @@ export default function UploadPage() {
                       disabled={!appId}
                       className="flex-1 px-6 py-3 text-sm font-medium text-white bg-kavosz-teal-primary hover:bg-kavosz-teal-hover rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
-                      Adatok kinyerése
+                      {t('upload.extractData', language)}
                     </button>
                     <button
                       onClick={() => setDocuments([])}
                       className="px-6 py-3 text-sm font-medium text-kavosz-text-muted bg-white border border-kavosz-border rounded-lg hover:bg-gray-50 transition-colors"
                     >
-                      Törlés
+                      {t('common.delete', language)}
                     </button>
                   </div>
                 </div>
@@ -261,7 +264,7 @@ export default function UploadPage() {
                     />
                   </div>
                   <p className="text-sm text-kavosz-text-muted">
-                    Dokumentumok elemzése folyamatban... ({completed}/{total})
+                    {t('upload.processingDocs', language)} ({completed}/{total})
                   </p>
                 </div>
 
@@ -289,10 +292,10 @@ export default function UploadPage() {
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-kavosz-text-primary truncate">{doc.file.name}</p>
                           <p className="text-xs text-kavosz-text-muted">
-                            {doc.status === 'uploading' && 'Feltöltés...'}
-                            {doc.status === 'processing' && 'Feldolgozás...'}
-                            {doc.status === 'complete' && 'Kész'}
-                            {doc.status === 'error' && 'Hiba'}
+                            {doc.status === 'uploading' && t('upload.uploading', language)}
+                            {doc.status === 'processing' && t('upload.processing', language)}
+                            {doc.status === 'complete' && t('upload.complete', language)}
+                            {doc.status === 'error' && t('upload.error', language)}
                           </p>
                         </div>
                       </div>
@@ -322,7 +325,7 @@ export default function UploadPage() {
               onClick={handleReset}
               className="px-6 py-3 text-sm font-medium text-white bg-kavosz-teal-primary hover:bg-kavosz-teal-hover rounded-lg transition-colors"
             >
-              Új feltöltés
+              {t('upload.uploadMore', language)}
             </button>
           </div>
 
@@ -337,7 +340,7 @@ export default function UploadPage() {
                 </svg>
                 <div className="flex-1">
                   <h4 className="text-sm font-semibold text-red-800 mb-1">
-                    Hiba történt: {doc.file.name}
+                    {t('upload.errorOccurred', language)} {doc.file.name}
                   </h4>
                   <p className="text-sm text-red-600">{doc.error}</p>
                 </div>
@@ -352,11 +355,11 @@ export default function UploadPage() {
               <div key={i} className="bg-white rounded-xl p-7 shadow-kavosz border border-kavosz-border mb-6">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-5">
-                  <h3 className="text-lg font-semibold text-kavosz-text-primary">Kinyert adatok</h3>
+                  <h3 className="text-lg font-semibold text-kavosz-text-primary">{t('upload.extractedData', language)}</h3>
                   <div className="flex items-center gap-2 px-3.5 py-2 bg-kavosz-teal-light rounded-full">
                     <div className="w-2 h-2 bg-kavosz-teal-primary rounded-full" />
                     <span className="text-[13px] font-medium text-kavosz-teal-primary">
-                      Feldolgozás kész
+                      {t('upload.processingComplete', language)}
                     </span>
                   </div>
                 </div>
@@ -364,13 +367,13 @@ export default function UploadPage() {
                 {/* Meta */}
                 <div className="flex gap-8 pb-5 mb-6 border-b border-kavosz-border">
                   <div className="flex gap-2">
-                    <span className="text-sm text-kavosz-text-muted">Dokumentum típusa:</span>
+                    <span className="text-sm text-kavosz-text-muted">{t('upload.documentType', language)}</span>
                     <span className="text-sm font-medium text-kavosz-text-primary">
-                      {doc.result.documentType?.replace('_', ' ')}
+                      {translateDocumentType(doc.result.documentType, language)}
                     </span>
                   </div>
                   <div className="flex gap-2">
-                    <span className="text-sm text-kavosz-text-muted">Megbízhatóság:</span>
+                    <span className="text-sm text-kavosz-text-muted">{t('upload.confidence', language)}</span>
                     <span className="text-sm font-medium text-kavosz-text-primary">
                       {(doc.result.classificationConfidence * 100).toFixed(0)}%
                     </span>
@@ -384,7 +387,7 @@ export default function UploadPage() {
                       {doc.result.extractedFields.map((field: any, idx: number) => (
                         <div key={idx}>
                           <label className="block text-sm font-semibold text-kavosz-text-primary mb-2">
-                            {field.fieldName?.replace('_', ' ')}
+                            {translateFieldName(field.fieldName, language)}
                           </label>
                           <div className="relative">
                             <input
@@ -413,22 +416,22 @@ export default function UploadPage() {
                     }}
                     className="px-6 py-3 text-sm font-medium text-white bg-kavosz-teal-primary hover:bg-kavosz-teal-hover rounded-lg transition-colors"
                   >
-                    {doc.showJson ? 'Mezők mutatása' : 'Részletek (JSON)'}
+                    {doc.showJson ? t('upload.showFields', language) : t('upload.showJson', language)}
                   </button>
                   <button
                     onClick={async () => {
-                      if (!doc.documentId || !confirm('Biztosan törölni szeretné ezt a dokumentumot?')) return
+                      if (!doc.documentId || !confirm(t('upload.confirmDelete', language))) return
 
                       try {
                         const res = await fetch(`/api/documents/${doc.documentId}`, { method: 'DELETE' })
                         if (res.ok) {
                           setDocuments(prev => prev.filter((_, idx) => idx !== i))
                         } else {
-                          alert('Hiba történt a törlés során')
+                          alert(t('upload.deleteError', language))
                         }
                       } catch (error) {
                         console.error('Delete error:', error)
-                        alert('Hiba történt a törlés során')
+                        alert(t('upload.deleteError', language))
                       }
                     }}
                     className="flex items-center gap-1.5 px-6 py-3 text-sm font-medium text-red-500 bg-transparent hover:bg-red-50 rounded-lg transition-colors"
@@ -437,14 +440,14 @@ export default function UploadPage() {
                       <polyline points="3,6 5,6 21,6"/>
                       <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
                     </svg>
-                    Ügylet törlése
+                    {t('upload.deleteDocument', language)}
                   </button>
                 </div>
 
                 {/* JSON View */}
                 {doc.showJson && (
                   <div className="mt-6 pt-6 border-t border-kavosz-border">
-                    <h4 className="text-sm font-semibold text-kavosz-text-primary mb-3">JSON Részletek</h4>
+                    <h4 className="text-sm font-semibold text-kavosz-text-primary mb-3">{t('upload.jsonDetails', language)}</h4>
                     <pre className="bg-gray-50 border border-kavosz-border rounded-lg p-4 text-xs overflow-auto max-h-96">
                       {JSON.stringify(doc.result, null, 2)}
                     </pre>
@@ -456,7 +459,7 @@ export default function UploadPage() {
 
           {!hasResults && (
             <div className="text-center py-12">
-              <p className="text-kavosz-text-muted">Nincs feldolgozott dokumentum</p>
+              <p className="text-kavosz-text-muted">{t('upload.noProcessedDocs', language)}</p>
             </div>
           )}
         </div>
