@@ -3,6 +3,8 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Header from '@/components/Header'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { translateFieldName, translateDocumentType } from '@/lib/translations'
 
 interface Field {
   fieldName: string
@@ -24,6 +26,7 @@ function FeldolgozasContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const docId = searchParams.get('docId')
+  const { language } = useLanguage()
 
   const [document, setDocument] = useState<DocumentData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -141,7 +144,7 @@ function FeldolgozasContent() {
               <div className="flex gap-2">
                 <span className="text-sm text-kavosz-text-muted">Dokumentum típusa:</span>
                 <span className="text-sm font-medium text-kavosz-text-primary">
-                  {document.doc_type?.replace('_', ' ') || 'UNKNOWN'}
+                  {translateDocumentType(document.doc_type || 'UNKNOWN', language)}
                 </span>
               </div>
               <div className="flex gap-2">
@@ -160,7 +163,7 @@ function FeldolgozasContent() {
                   {document.extractedFields.map((field, idx) => (
                     <div key={idx}>
                       <label className="block text-sm font-semibold text-kavosz-text-primary mb-2">
-                        {field.fieldName?.replace('_', ' ')}
+                        {translateFieldName(field.fieldName, language)}
                       </label>
                       <div className="relative">
                         <input

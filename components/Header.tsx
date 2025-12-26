@@ -4,12 +4,14 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 export default function Header() {
   const pathname = usePathname()
   const router = useRouter()
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const { language, setLanguage } = useLanguage()
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -119,6 +121,34 @@ export default function Header() {
                 <p className="text-xs text-kavosz-text-muted">Bejelentkezve:</p>
                 <p className="text-sm font-medium text-kavosz-text-primary truncate">{userEmail}</p>
               </div>
+
+              {/* Language Switcher */}
+              <div className="p-2 border-b border-kavosz-border">
+                <p className="text-xs text-kavosz-text-muted px-2 mb-1.5">Nyelv / Language</p>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setLanguage('hu')}
+                    className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                      language === 'hu'
+                        ? 'bg-kavosz-teal-primary text-white'
+                        : 'text-kavosz-text-secondary hover:bg-gray-50'
+                    }`}
+                  >
+                    🇭🇺 Magyar
+                  </button>
+                  <button
+                    onClick={() => setLanguage('en')}
+                    className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                      language === 'en'
+                        ? 'bg-kavosz-teal-primary text-white'
+                        : 'text-kavosz-text-secondary hover:bg-gray-50'
+                    }`}
+                  >
+                    🇬🇧 English
+                  </button>
+                </div>
+              </div>
+
               <button
                 onClick={handleLogout}
                 className="w-full px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"

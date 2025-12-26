@@ -34,11 +34,12 @@ export async function GET(
     // Fetch extracted fields
     const { data: fields, error: fieldsError } = await supabase
       .from('extracted_fields')
-      .select('*')
+      .select('id, document_id, field_key, field_value, confidence, validation_status')
       .eq('document_id', id)
 
     if (fieldsError) {
       console.error('Fields fetch error:', fieldsError)
+      return NextResponse.json({ error: 'Failed to fetch fields' }, { status: 500 })
     }
 
     const extractedFields = fields?.map(f => ({
