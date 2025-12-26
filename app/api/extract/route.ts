@@ -144,35 +144,45 @@ export async function POST(request: NextRequest) {
 
     // Generate embeddings for RAG pipeline
     try {
+      console.log('[Extract] Starting embedding generation...')
+
       // Chunk the OCR text
       const chunks = chunkByStructure(ocrText, 1000)
+      console.log('[Extract] Created', chunks.length, 'chunks')
 
       if (chunks.length > 0) {
         // Generate embeddings for all chunks
+        console.log('[Extract] Generating embeddings for', chunks.length, 'chunks...')
         const embeddings = await generateEmbeddingsBatched(
           chunks.map(c => c.text),
           50 // Batch size
         )
+        console.log('[Extract] Generated', embeddings.length, 'embeddings')
 
-        // Store chunks with embeddings
+        // Store chunks with embeddings - convert arrays to PostgreSQL format
         const chunkRecords = chunks.map((chunk, idx) => ({
           document_id: documentId,
           chunk_text: chunk.text,
           chunk_index: chunk.index,
-          embedding: embeddings[idx] // Store as array, not string
+          embedding: JSON.stringify(embeddings[idx]) // Store as JSON string for PostgreSQL
         }))
 
+        console.log('[Extract] Inserting', chunkRecords.length, 'chunk records...')
         const { error: chunkError } = await supabase
           .from('document_chunks')
           .insert(chunkRecords)
 
         if (chunkError) {
-          console.error('Error storing chunks:', chunkError)
+          console.error('[Extract] Error storing chunks:', chunkError)
           // Don't fail the whole request if chunk storage fails
+        } else {
+          console.log('[Extract] Successfully stored', chunkRecords.length, 'chunks')
         }
+      } else {
+        console.log('[Extract] No chunks created from OCR text')
       }
     } catch (embeddingError) {
-      console.error('Error generating embeddings:', embeddingError)
+      console.error('[Extract] Error generating embeddings:', embeddingError)
       // Don't fail the whole request if embedding generation fails
     }
 
