@@ -46,43 +46,69 @@ export async function POST(request: NextRequest) {
     .eq('id', documentId)
 
   try {
-    // Get file URL from Supabase Storage
-    const { data: urlData } = await supabase.storage
-      .from('documents')
-      .createSignedUrl(doc.file_path, 3600) // 1 hour expiry
+    let ocrText = ''
 
-    if (!urlData?.signedUrl) {
-      throw new Error('Failed to get file URL')
-    }
+    // Check if file is PDF or image
+    const isPDF = doc.file_type === 'application/pdf' || doc.file_name.toLowerCase().endsWith('.pdf')
 
-    // Use OpenAI Vision to extract text from image
-    const OpenAI = (await import('openai')).default
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+    if (isPDF) {
+      // Handle PDF files
+      const { data: fileData } = await supabase.storage
+        .from('documents')
+        .download(doc.file_path)
 
-    const visionResponse = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'text',
-              text: 'Extract all text from this document image. Return only the raw text content, preserving the layout as much as possible.',
-            },
-            {
-              type: 'image_url',
-              image_url: { url: urlData.signedUrl },
-            },
-          ],
-        },
-      ],
-      max_tokens: 4096,
-    })
+      if (!fileData) {
+        throw new Error('Failed to download PDF file')
+      }
 
-    const ocrText = visionResponse.choices[0]?.message?.content || ''
+      const pdfParse = (await import('pdf-parse')) as any
+      const arrayBuffer = await fileData.arrayBuffer()
+      const buffer = Buffer.from(arrayBuffer)
+      const pdfData = await pdfParse(buffer)
 
-    if (!ocrText || ocrText.trim().length === 0) {
-      throw new Error('No text extracted from document')
+      ocrText = pdfData.text
+
+      if (!ocrText || ocrText.trim().length === 0) {
+        throw new Error('No text extracted from PDF')
+      }
+    } else {
+      // Handle image files with OpenAI Vision
+      const { data: urlData } = await supabase.storage
+        .from('documents')
+        .createSignedUrl(doc.file_path, 3600) // 1 hour expiry
+
+      if (!urlData?.signedUrl) {
+        throw new Error('Failed to get file URL')
+      }
+
+      const OpenAI = (await import('openai')).default
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+
+      const visionResponse = await openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: 'Extract all text from this document image. Return only the raw text content, preserving the layout as much as possible.',
+              },
+              {
+                type: 'image_url',
+                image_url: { url: urlData.signedUrl },
+              },
+            ],
+          },
+        ],
+        max_tokens: 4096,
+      })
+
+      ocrText = visionResponse.choices[0]?.message?.content || ''
+
+      if (!ocrText || ocrText.trim().length === 0) {
+        throw new Error('No text extracted from document')
+      }
     }
 
     // Classify document type
