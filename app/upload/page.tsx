@@ -41,11 +41,23 @@ export default function UploadPage() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
-      'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.bmp'],
+      'image/png': ['.png'],
+      'image/jpeg': ['.jpg', '.jpeg'],
       'application/pdf': ['.pdf']
     },
     multiple: true,
-    onDrop: (acceptedFiles) => {
+    noClick: false,
+    noKeyboard: false,
+    onDrop: (acceptedFiles, rejectedFiles) => {
+      if (rejectedFiles.length > 0) {
+        alert(`Nem támogatott fájlformátum. Csak PDF, PNG, JPG és JPEG fájlokat fogadunk el.`)
+        return
+      }
+
+      if (acceptedFiles.length === 0) {
+        return
+      }
+
       const newDocs = acceptedFiles.map(file => ({
         file,
         status: 'pending' as const
@@ -150,39 +162,26 @@ export default function UploadPage() {
 
             {/* Upload Card */}
             <div className="bg-white rounded-xl shadow-kavosz border border-kavosz-border overflow-hidden">
-              <div
-                {...getRootProps()}
-                className={`px-6 py-12 text-center cursor-pointer transition-colors ${
-                  isDragActive ? 'bg-kavosz-teal-light' : 'bg-white'
-                }`}
-              >
-                <input {...getInputProps()} />
-                <div className="mb-4">
-                  <svg className="mx-auto" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="17,8 12,3 7,8"/>
-                    <line x1="12" y1="3" x2="12" y2="15"/>
-                  </svg>
+              <div className="px-6 py-12 text-center">
+                <div
+                  {...getRootProps()}
+                  className={`cursor-pointer transition-colors rounded-lg p-6 ${
+                    isDragActive ? 'bg-kavosz-teal-light' : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <input {...getInputProps()} />
+                  <div className="mb-4">
+                    <svg className="mx-auto" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.5">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="17,8 12,3 7,8"/>
+                      <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                  </div>
+                  <p className="text-base font-medium text-kavosz-text-secondary mb-1">
+                    Húzza ide a fájlokat vagy kattintson a tallózáshoz
+                  </p>
+                  <p className="text-xs text-kavosz-text-light mt-3">Maximum 10MB fájlonként</p>
                 </div>
-                <p className="text-base font-medium text-kavosz-text-secondary mb-1">
-                  Húzza ide a fájlokat
-                </p>
-                <p className="text-sm text-kavosz-text-light mb-3">vagy</p>
-                <label className="inline-block px-5 py-2.5 text-sm font-medium text-kavosz-teal-primary bg-kavosz-teal-light rounded-lg cursor-pointer mb-3">
-                  Tallózás
-                  <input
-                    type="file"
-                    multiple
-                    accept=".pdf,.png,.jpg,.jpeg"
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files || [])
-                      const newDocs = files.map(file => ({ file, status: 'pending' as const }))
-                      setDocuments(prev => [...prev, ...newDocs])
-                    }}
-                    className="hidden"
-                  />
-                </label>
-                <p className="text-xs text-kavosz-text-light">Maximum 10MB fájlonként</p>
               </div>
 
               {/* File List */}
@@ -280,6 +279,35 @@ export default function UploadPage() {
 
       <main className="pb-12">
         <div className="max-w-[960px] mx-auto px-6 py-8">
+          {/* Action buttons */}
+          <div className="flex gap-3 mb-6">
+            <button
+              onClick={handleReset}
+              className="px-6 py-3 text-sm font-medium text-white bg-kavosz-teal-primary hover:bg-kavosz-teal-hover rounded-lg transition-colors"
+            >
+              Új feltöltés
+            </button>
+          </div>
+
+          {/* Show errors */}
+          {documents.filter(d => d.status === 'error').map((doc, i) => (
+            <div key={`error-${i}`} className="bg-red-50 border border-red-200 rounded-xl p-6 mb-6">
+              <div className="flex items-start gap-3">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <div className="flex-1">
+                  <h4 className="text-sm font-semibold text-red-800 mb-1">
+                    Hiba történt: {doc.file.name}
+                  </h4>
+                  <p className="text-sm text-red-600">{doc.error}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+
           {hasResults && documents.map((doc, i) => {
             if (doc.status !== 'complete' || !doc.result) return null
 

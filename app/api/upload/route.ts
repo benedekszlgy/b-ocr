@@ -52,11 +52,12 @@ export async function POST(request: NextRequest) {
   const { data: doc, error: docError } = await supabase
     .from('documents')
     .insert({
+      user_id: userId,
       application_id: applicationId,
-      filename: file.name,
+      file_name: file.name,
       file_path: uploadData.path,
       file_size: file.size,
-      mime_type: file.type,
+      file_type: file.type,
       status: 'pending',
     })
     .select()
