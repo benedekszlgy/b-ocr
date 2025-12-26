@@ -67,12 +67,13 @@ export function UploadQueueProvider({ children }: { children: React.ReactNode })
 
   // Process queue - runs continuously in background
   useEffect(() => {
-    if (pendingCountRef.current === 0) return
-
     let isMounted = true
 
     const processQueue = async () => {
       if (processingRef.current) return
+
+      // Check if there are actually pending items
+      if (pendingCountRef.current === 0) return
 
       processingRef.current = true
 
