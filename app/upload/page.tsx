@@ -45,17 +45,22 @@ export default function UploadPage() {
     noClick: false,
     noKeyboard: false,
     onDrop: (acceptedFiles, rejectedFiles) => {
+      console.log('onDrop called:', acceptedFiles.length, 'files, appId:', appId)
+
       if (rejectedFiles.length > 0) {
         alert(t('upload.unsupportedFormat', language))
         return
       }
 
       if (acceptedFiles.length === 0 || !appId) {
+        console.log('Skipping upload - no files or no appId')
         return
       }
 
       // Add all files to the background queue
+      console.log('Adding files to queue...')
       acceptedFiles.forEach(file => {
+        console.log('Adding file:', file.name)
         addToQueue(file, appId)
       })
 
