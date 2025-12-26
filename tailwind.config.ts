@@ -9,30 +9,21 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        stone: {
-          50: '#faf8f5',
-          100: '#f5f1e8',
-          200: '#e8e0d0',
-          300: '#d4c8b0',
-          400: '#c0b090',
-          500: '#a89878',
-          600: '#8b7a5e',
-          700: '#6e5f4a',
-          800: '#514438',
-          900: '#3a2f28',
+        // KAVOSZ Design System Colors
+        kavosz: {
+          bg: '#f7f8fa',
+          'teal-primary': '#0d9488',
+          'teal-hover': '#0f766e',
+          'teal-light': '#e6f7f6',
+          border: '#e5e7eb',
+          'text-primary': '#111827',
+          'text-secondary': '#374151',
+          'text-muted': '#6b7280',
+          'text-light': '#9ca3af',
         },
-        teal: {
-          50: '#f0f7f7',
-          100: '#d9eded',
-          200: '#b3dbdb',
-          300: '#8cc9c9',
-          400: '#66b7b7',
-          500: '#4a8b87',
-          600: '#3d7370',
-          700: '#2f5a57',
-          800: '#22413f',
-          900: '#152928',
-        },
+      },
+      boxShadow: {
+        'kavosz': '0 1px 3px rgba(0,0,0,0.04)',
       },
     },
   },
