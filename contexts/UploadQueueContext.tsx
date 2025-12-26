@@ -89,6 +89,8 @@ export function UploadQueueProvider({ children }: { children: React.ReactNode })
           if (!nextDoc) break
 
           try {
+            console.log('Starting upload for:', nextDoc.file.name)
+
             // Update to uploading
             setQueue(prev => prev.map(doc =>
               doc.id === nextDoc!.id
@@ -96,21 +98,28 @@ export function UploadQueueProvider({ children }: { children: React.ReactNode })
                 : doc
             ))
 
-            // Upload file
+            // Upload file with timeout
             const formData = new FormData()
             formData.append('file', nextDoc.file)
             formData.append('applicationId', nextDoc.applicationId)
 
+            const uploadController = new AbortController()
+            const uploadTimeout = setTimeout(() => uploadController.abort(), 30000) // 30s timeout
+
             const uploadRes = await fetch('/api/upload', {
               method: 'POST',
               body: formData,
-            })
+              signal: uploadController.signal,
+            }).finally(() => clearTimeout(uploadTimeout))
 
             const uploadData = await uploadRes.json()
 
             if (!uploadRes.ok) {
+              console.error('Upload failed:', uploadData)
               throw new Error(uploadData.error || 'Upload failed')
             }
+
+            console.log('Upload successful, starting extraction:', uploadData.document.id)
 
             // Update to processing
             setQueue(prev => prev.map(doc =>
@@ -119,29 +128,39 @@ export function UploadQueueProvider({ children }: { children: React.ReactNode })
                 : doc
             ))
 
-            // Extract data
+            // Extract data with timeout
+            const extractController = new AbortController()
+            const extractTimeout = setTimeout(() => extractController.abort(), 60000) // 60s timeout
+
             const extractRes = await fetch('/api/extract', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ documentId: uploadData.document.id }),
-            })
+              signal: extractController.signal,
+            }).finally(() => clearTimeout(extractTimeout))
 
             const extractData = await extractRes.json()
 
             if (extractRes.ok) {
+              console.log('Extraction successful:', extractData)
               setQueue(prev => prev.map(doc =>
                 doc.id === nextDoc!.id
                   ? { ...doc, status: 'complete' as const, progress: 100, result: extractData }
                   : doc
               ))
             } else {
+              console.error('Extraction failed:', extractData)
               throw new Error(extractData.error || 'Extraction failed')
             }
           } catch (error: any) {
             console.error('Error processing document:', error)
+            const errorMessage = error.name === 'AbortError'
+              ? 'Request timeout - please try again'
+              : (error.message || 'Upload failed')
+
             setQueue(prev => prev.map(doc =>
               doc.id === nextDoc!.id
-                ? { ...doc, status: 'error' as const, progress: 0, error: error.message }
+                ? { ...doc, status: 'error' as const, progress: 0, error: errorMessage }
                 : doc
             ))
           }
