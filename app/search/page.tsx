@@ -18,6 +18,7 @@ export default function SearchPage() {
   const { language } = useLanguage()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
+  const [answer, setAnswer] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
   const [debugInfo, setDebugInfo] = useState<string>('')
@@ -27,6 +28,7 @@ export default function SearchPage() {
 
     setLoading(true)
     setSearched(true)
+    setAnswer('')
 
     try {
       const res = await fetch('/api/search', {
@@ -38,6 +40,7 @@ export default function SearchPage() {
       if (res.ok) {
         const data = await res.json()
         setResults(data.results || [])
+        setAnswer(data.answer || '')
         if (data.debug) {
           setDebugInfo(data.debug + (data.statuses ? ` - Statuses: ${data.statuses.join(', ')}` : ''))
         } else {
@@ -45,11 +48,13 @@ export default function SearchPage() {
         }
       } else {
         setResults([])
+        setAnswer('')
         setDebugInfo('Error fetching results')
       }
     } catch (error) {
       console.error('Search error:', error)
       setResults([])
+      setAnswer('')
     } finally {
       setLoading(false)
     }
@@ -144,6 +149,27 @@ export default function SearchPage() {
             </div>
           ) : results.length > 0 ? (
             <div className="space-y-4">
+              {/* AI Answer */}
+              {answer && (
+                <div className="bg-gradient-to-r from-kavosz-teal-light to-white rounded-xl p-6 shadow-kavosz border border-kavosz-teal-primary/20 mb-6">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-kavosz-teal-primary rounded-full flex items-center justify-center">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-sm font-semibold text-kavosz-teal-primary mb-2">AI Válasz</h3>
+                      <p className="text-sm text-kavosz-text-primary whitespace-pre-wrap leading-relaxed">
+                        {answer}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <p className="text-sm text-kavosz-text-muted">
                 {results.length} {t('search.resultsCount', language)}
               </p>

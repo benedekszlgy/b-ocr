@@ -238,7 +238,43 @@ export async function POST(request: NextRequest) {
 
     console.log('[RAG Search] Returning', results.length, 'documents')
 
-    return NextResponse.json({ results: results.slice(0, 20) })
+    // Generate AI answer based on found documents
+    let aiAnswer = ''
+    try {
+      const OpenAI = (await import('openai')).default
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+
+      // Gather context from top results
+      const context = results.slice(0, 3).map((r, idx) =>
+        `[Document ${idx + 1}: ${r.documentName}]\n${r.excerpt}`
+      ).join('\n\n')
+
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a helpful assistant that answers questions based on provided documents. Always reference which document you got the information from.'
+          },
+          {
+            role: 'user',
+            content: `Based on these documents, answer the question: "${query}"\n\nDocuments:\n${context}`
+          }
+        ],
+        max_tokens: 500
+      })
+
+      aiAnswer = completion.choices[0]?.message?.content || ''
+      console.log('[RAG Search] Generated AI answer')
+    } catch (aiError) {
+      console.error('[RAG Search] Error generating AI answer:', aiError)
+      // Continue without AI answer
+    }
+
+    return NextResponse.json({
+      results: results.slice(0, 20),
+      answer: aiAnswer || null
+    })
   } catch (error: any) {
     console.error('[RAG Search] Error:', error)
     return NextResponse.json({
