@@ -14,7 +14,7 @@ export const DOCUMENT_TYPES: DocumentType[] = [
 
 export const EXTRACTION_PROMPTS: Record<DocumentType, string> = {
   INVOICE: `Extract these fields from the invoice/receipt OCR text.
-Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": 0.95}]}
+Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": <number>}]}
 
 Fields to extract:
 - invoice_number
@@ -28,10 +28,16 @@ Fields to extract:
 - currency
 - payment_terms
 
-Set confidence 0.0-1.0 based on text clarity. Use null if not found.`,
+IMPORTANT: Set confidence as a decimal 0.0-1.0 based on:
+- 0.95-1.0: Field clearly visible, unambiguous value
+- 0.75-0.95: Field found but slightly unclear or requires minor interpretation
+- 0.50-0.75: Field found but ambiguous, multiple possible values
+- 0.25-0.50: Field partially visible or requires significant interpretation
+- 0.0-0.25: Field barely visible or highly uncertain
+Use null for value if field not found. Do not use 0.95 as default - evaluate each field independently.`,
 
   ID_CARD: `Extract these fields from the ID document OCR text.
-Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": 0.95}]}
+Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": <number>}]}
 
 Fields to extract:
 - full_name
@@ -41,10 +47,10 @@ Fields to extract:
 - expiry_date (YYYY-MM-DD format)
 - issuing_state
 
-Set confidence 0.0-1.0 based on text clarity. Use null if not found.`,
+IMPORTANT: Set confidence 0.0-1.0 based on text clarity (0.95-1.0 clear, 0.5-0.75 ambiguous, etc). Evaluate each field independently. Use null if not found.`,
 
   BANK_STATEMENT: `Extract these fields from the bank statement OCR text.
-Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": 0.95}]}
+Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": <number>}]}
 
 Fields to extract:
 - account_holder_name
@@ -57,10 +63,10 @@ Fields to extract:
 - total_deposits (number only)
 - total_withdrawals (number only)
 
-Set confidence 0.0-1.0 based on text clarity. Use null if not found.`,
+IMPORTANT: Set confidence 0.0-1.0 based on text clarity (0.95-1.0 clear, 0.5-0.75 ambiguous, etc). Evaluate each field independently. Use null if not found.`,
 
   PAY_STUB: `Extract these fields from the pay stub OCR text.
-Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": 0.95}]}
+Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": <number>}]}
 
 Fields to extract:
 - employee_name
@@ -72,10 +78,10 @@ Fields to extract:
 - ytd_gross (number only)
 - pay_frequency (weekly/biweekly/monthly)
 
-Set confidence 0.0-1.0 based on text clarity. Use null if not found.`,
+IMPORTANT: Set confidence 0.0-1.0 based on text clarity (0.95-1.0 clear, 0.5-0.75 ambiguous, etc). Evaluate each field independently. Use null if not found.`,
 
   TAX_RETURN: `Extract these fields from the tax document OCR text.
-Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": 0.95}]}
+Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": <number>}]}
 
 Fields to extract:
 - taxpayer_name
@@ -88,10 +94,10 @@ Fields to extract:
 - employer_name (if W2)
 - wages (if W2, number only)
 
-Set confidence 0.0-1.0 based on text clarity. Use null if not found.`,
+IMPORTANT: Set confidence 0.0-1.0 based on text clarity (0.95-1.0 clear, 0.5-0.75 ambiguous, etc). Evaluate each field independently. Use null if not found.`,
 
   UTILITY_BILL: `Extract these fields from the utility bill OCR text.
-Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": 0.95}]}
+Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": <number>}]}
 
 Fields to extract:
 - account_holder_name
@@ -100,10 +106,10 @@ Fields to extract:
 - amount_due (number only)
 - utility_provider
 
-Set confidence 0.0-1.0 based on text clarity. Use null if not found.`,
+IMPORTANT: Set confidence 0.0-1.0 based on text clarity (0.95-1.0 clear, 0.5-0.75 ambiguous, etc). Evaluate each field independently. Use null if not found.`,
 
   EMPLOYMENT_LETTER: `Extract these fields from the employment letter OCR text.
-Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": 0.95}]}
+Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": <number>}]}
 
 Fields to extract:
 - employee_name
@@ -114,10 +120,10 @@ Fields to extract:
 - salary_frequency (annual/monthly/hourly)
 - employment_status (full-time/part-time/contract)
 
-Set confidence 0.0-1.0 based on text clarity. Use null if not found.`,
+IMPORTANT: Set confidence 0.0-1.0 based on text clarity (0.95-1.0 clear, 0.5-0.75 ambiguous, etc). Evaluate each field independently. Use null if not found.`,
 
   UNKNOWN: `Extract any relevant personal or financial information from this document.
-Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": 0.95}]}
+Return JSON: {"fields": [{"key": "field_name", "value": "extracted_value", "confidence": <number>}]}
 
 Look for:
 - Names
@@ -127,5 +133,5 @@ Look for:
 - Monetary amounts
 - Any identifying information
 
-Set confidence 0.0-1.0 based on text clarity.`,
+IMPORTANT: Set confidence 0.0-1.0 based on text clarity (0.95-1.0 clear, 0.5-0.75 ambiguous, etc). Evaluate each field independently.`,
 }
