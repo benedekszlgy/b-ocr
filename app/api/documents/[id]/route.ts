@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
 
 export async function GET(
   request: NextRequest,
@@ -7,10 +8,11 @@ export async function GET(
 ) {
   try {
     const { id } = await context.params
-    const supabase = await createClient()
+    const authClient = await createClient()
+    const supabase = createServiceClient()
 
     // Get current user
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user } } = await authClient.auth.getUser()
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -51,12 +53,20 @@ export async function GET(
     // Generate signed URL for file access
     let signedUrl = document.file_path
     if (document.file_path) {
-      const { data: urlData } = await supabase.storage
+      console.log('[Document API] Generating signed URL for:', document.file_path)
+      const { data: urlData, error: urlError } = await supabase.storage
         .from('documents')
         .createSignedUrl(document.file_path, 3600) // 1 hour expiry
 
+      if (urlError) {
+        console.error('[Document API] Signed URL error:', urlError)
+      }
+
       if (urlData?.signedUrl) {
         signedUrl = urlData.signedUrl
+        console.log('[Document API] Generated signed URL:', signedUrl)
+      } else {
+        console.log('[Document API] No signed URL generated, using file_path')
       }
     }
 
@@ -79,10 +89,11 @@ export async function DELETE(
 ) {
   try {
     const { id } = await context.params
-    const supabase = await createClient()
+    const authClient = await createClient()
+    const supabase = createServiceClient()
 
     // Get current user
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user } } = await authClient.auth.getUser()
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
