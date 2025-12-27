@@ -148,13 +148,64 @@ export const fieldNameTranslations: Record<string, { hu: string; en: string }> =
   'merchant_name': { hu: 'Kereskedő neve', en: 'Merchant Name' },
   'items': { hu: 'Tételek', en: 'Items' },
 
+  // ID Card fields
+  'full_name': { hu: 'Teljes név', en: 'Full Name' },
+  'date_of_birth': { hu: 'Születési dátum', en: 'Date of Birth' },
+  'address': { hu: 'Lakcím', en: 'Address' },
+  'document_number': { hu: 'Okmányazonosító', en: 'Document Number' },
+  'expiry_date': { hu: 'Lejárat', en: 'Expiry Date' },
+  'issuing_state': { hu: 'Kiállító állam', en: 'Issuing State' },
+
+  // Bank Statement fields
+  'account_holder_name': { hu: 'Számlatulajdonos neve', en: 'Account Holder Name' },
+  'account_number': { hu: 'Számlaszám', en: 'Account Number' },
+  'bank_name': { hu: 'Bank neve', en: 'Bank Name' },
+  'statement_period_start': { hu: 'Kivonat kezdete', en: 'Statement Period Start' },
+  'statement_period_end': { hu: 'Kivonat vége', en: 'Statement Period End' },
+  'opening_balance': { hu: 'Nyitó egyenleg', en: 'Opening Balance' },
+  'closing_balance': { hu: 'Záró egyenleg', en: 'Closing Balance' },
+  'total_deposits': { hu: 'Összes befizetés', en: 'Total Deposits' },
+  'total_withdrawals': { hu: 'Összes kifizetés', en: 'Total Withdrawals' },
+
+  // Pay Stub fields
+  'employee_name': { hu: 'Munkavállaló neve', en: 'Employee Name' },
+  'employer_name': { hu: 'Munkáltató neve', en: 'Employer Name' },
+  'pay_period_start': { hu: 'Fizetési időszak kezdete', en: 'Pay Period Start' },
+  'pay_period_end': { hu: 'Fizetési időszak vége', en: 'Pay Period End' },
+  'gross_pay': { hu: 'Bruttó bér', en: 'Gross Pay' },
+  'net_pay': { hu: 'Nettó bér', en: 'Net Pay' },
+  'ytd_gross': { hu: 'Éves bruttó', en: 'YTD Gross' },
+  'pay_frequency': { hu: 'Fizetési gyakoriság', en: 'Pay Frequency' },
+
+  // Tax Return fields
+  'taxpayer_name': { hu: 'Adózó neve', en: 'Taxpayer Name' },
+  'tax_year': { hu: 'Adóév', en: 'Tax Year' },
+  'filing_status': { hu: 'Bejelentési státusz', en: 'Filing Status' },
+  'total_income': { hu: 'Összes jövedelem', en: 'Total Income' },
+  'adjusted_gross_income': { hu: 'Korrigált bruttó jövedelem', en: 'Adjusted Gross Income' },
+  'taxable_income': { hu: 'Adóköteles jövedelem', en: 'Taxable Income' },
+  'total_tax': { hu: 'Összes adó', en: 'Total Tax' },
+  'wages': { hu: 'Bérek', en: 'Wages' },
+
+  // Utility Bill fields
+  'service_address': { hu: 'Szolgáltatási cím', en: 'Service Address' },
+  'bill_date': { hu: 'Számla kelte', en: 'Bill Date' },
+  'amount_due': { hu: 'Fizetendő összeg', en: 'Amount Due' },
+  'utility_provider': { hu: 'Szolgáltató', en: 'Utility Provider' },
+
+  // Employment Letter fields
+  'job_title': { hu: 'Beosztás', en: 'Job Title' },
+  'employment_start_date': { hu: 'Munkaviszony kezdete', en: 'Employment Start Date' },
+  'salary': { hu: 'Fizetés', en: 'Salary' },
+  'salary_frequency': { hu: 'Fizetési gyakoriság', en: 'Salary Frequency' },
+  'employment_status': { hu: 'Munkaviszony típusa', en: 'Employment Status' },
+
   // Contract fields
   'contract_number': { hu: 'Szerződésszám', en: 'Contract Number' },
   'contract_date': { hu: 'Szerződés kelte', en: 'Contract Date' },
   'party_a': { hu: 'Fél A', en: 'Party A' },
   'party_b': { hu: 'Fél B', en: 'Party B' },
   'effective_date': { hu: 'Hatályba lépés', en: 'Effective Date' },
-  'expiry_date': { hu: 'Lejárat', en: 'Expiry Date' },
 
   // Common fields
   'date': { hu: 'Dátum', en: 'Date' },
@@ -168,6 +219,12 @@ export const fieldNameTranslations: Record<string, { hu: string; en: string }> =
 export const documentTypeTranslations: Record<string, { hu: string; en: string }> = {
   'INVOICE': { hu: 'Számla', en: 'Invoice' },
   'RECEIPT': { hu: 'Bizonylat', en: 'Receipt' },
+  'ID_CARD': { hu: 'Személyi igazolvány', en: 'ID Card' },
+  'BANK_STATEMENT': { hu: 'Bankszámlakivonat', en: 'Bank Statement' },
+  'PAY_STUB': { hu: 'Fizetési jegyzék', en: 'Pay Stub' },
+  'TAX_RETURN': { hu: 'Adóbevallás', en: 'Tax Return' },
+  'UTILITY_BILL': { hu: 'Közműszámla', en: 'Utility Bill' },
+  'EMPLOYMENT_LETTER': { hu: 'Munkáltatói igazolás', en: 'Employment Letter' },
   'CONTRACT': { hu: 'Szerződés', en: 'Contract' },
   'PURCHASE_ORDER': { hu: 'Megrendelés', en: 'Purchase Order' },
   'DELIVERY_NOTE': { hu: 'Szállítólevél', en: 'Delivery Note' },

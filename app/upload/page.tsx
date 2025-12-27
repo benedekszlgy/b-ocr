@@ -93,6 +93,98 @@ export default function UploadPage() {
             </p>
           </div>
 
+          {/* Supported Documents Section */}
+          <div className="bg-white rounded-xl shadow-kavosz border border-kavosz-border p-6 mb-6">
+            <h2 className="text-lg font-semibold text-kavosz-text-primary mb-4">
+              {language === 'hu' ? 'Támogatott dokumentumok' : 'Supported Documents'}
+            </h2>
+
+            {/* File Formats */}
+            <div className="mb-5">
+              <h3 className="text-sm font-medium text-kavosz-text-secondary mb-3">
+                {language === 'hu' ? 'Fájlformátumok:' : 'File Formats:'}
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                <span className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg">PNG</span>
+                <span className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg">JPEG</span>
+                <span className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg">PDF</span>
+              </div>
+            </div>
+
+            {/* Document Types */}
+            <div>
+              <h3 className="text-sm font-medium text-kavosz-text-secondary mb-3">
+                {language === 'hu' ? 'Dokumentumtípusok:' : 'Document Types:'}
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="flex items-start gap-2">
+                  <svg className="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0d9488" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span className="text-sm text-kavosz-text-primary">
+                    {language === 'hu' ? 'Számlák / Nyugták' : 'Invoices / Receipts'}
+                  </span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <svg className="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0d9488" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span className="text-sm text-kavosz-text-primary">
+                    {language === 'hu' ? 'Személyi igazolványok' : 'ID Cards'}
+                  </span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <svg className="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0d9488" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span className="text-sm text-kavosz-text-primary">
+                    {language === 'hu' ? 'Bankszámlakivonatok' : 'Bank Statements'}
+                  </span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <svg className="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0d9488" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span className="text-sm text-kavosz-text-primary">
+                    {language === 'hu' ? 'Fizetési jegyzékek' : 'Pay Stubs'}
+                  </span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <svg className="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0d9488" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span className="text-sm text-kavosz-text-primary">
+                    {language === 'hu' ? 'Adóbevallások' : 'Tax Returns'}
+                  </span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <svg className="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0d9488" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span className="text-sm text-kavosz-text-primary">
+                    {language === 'hu' ? 'Közműszámlák' : 'Utility Bills'}
+                  </span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <svg className="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0d9488" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span className="text-sm text-kavosz-text-primary">
+                    {language === 'hu' ? 'Munkáltatói igazolások' : 'Employment Letters'}
+                  </span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <svg className="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0d9488" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  <span className="text-sm text-kavosz-text-primary">
+                    {language === 'hu' ? 'Egyéb dokumentumok' : 'Other Documents'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Upload Card */}
           <div className="bg-white rounded-xl shadow-kavosz border border-kavosz-border overflow-hidden">
             <div className="px-6 py-12 text-center">
