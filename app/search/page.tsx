@@ -176,20 +176,44 @@ export default function SearchPage() {
               {results.map((result, index) => (
                 <div
                   key={index}
-                  onClick={() => router.push(`/feldolgozas?docId=${result.documentId}`)}
-                  className="bg-white rounded-xl p-5 shadow-kavosz border border-kavosz-border hover:shadow-md transition-shadow cursor-pointer"
+                  className="bg-white rounded-xl shadow-kavosz border border-kavosz-border overflow-hidden"
                 >
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="text-base font-semibold text-kavosz-text-primary">
-                      {result.documentName}
-                    </h3>
-                    <span className="text-xs px-2 py-1 bg-kavosz-teal-light text-kavosz-teal-primary rounded-full">
-                      {(result.relevance * 100).toFixed(0)}% {t('search.relevance', language)}
-                    </span>
+                  {/* Document Header */}
+                  <div className="px-5 pt-5 pb-3">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="flex-shrink-0 w-8 h-8 bg-kavosz-teal-light rounded-lg flex items-center justify-center">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0d9488" strokeWidth="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                          </svg>
+                        </div>
+                        <h3 className="text-base font-semibold text-kavosz-text-primary">
+                          {result.documentName}
+                        </h3>
+                      </div>
+                      <span className="text-xs px-2 py-1 bg-kavosz-teal-light text-kavosz-teal-primary rounded-full">
+                        {(result.relevance * 100).toFixed(0)}% {t('search.relevance', language)}
+                      </span>
+                    </div>
+                    <p className="text-sm text-kavosz-text-muted leading-relaxed">
+                      ...{result.excerpt}...
+                    </p>
                   </div>
-                  <p className="text-sm text-kavosz-text-muted leading-relaxed">
-                    ...{result.excerpt}...
-                  </p>
+
+                  {/* View Document Button */}
+                  <div className="px-5 pb-4">
+                    <button
+                      onClick={() => router.push(`/feldolgozas?docId=${result.documentId}`)}
+                      className="w-full px-4 py-2.5 text-sm font-medium text-kavosz-teal-primary bg-kavosz-teal-light hover:bg-kavosz-teal-primary hover:text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                      Dokumentum megtekintése
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
