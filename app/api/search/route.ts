@@ -169,21 +169,29 @@ export async function POST(request: NextRequest) {
           similarity
         }
       })
-      .filter(chunk => chunk.similarity > 0.5) // Filter by threshold
-      .sort((a, b) => b.similarity - a.similarity) // Sort by similarity
+      .sort((a, b) => b.similarity - a.similarity) // Sort by similarity first
+
+    // Log top similarities for debugging
+    console.log('[RAG Search] Top 3 similarities:', scoredChunks.slice(0, 3).map(c => ({
+      similarity: c.similarity,
+      preview: c.chunk_text.substring(0, 50)
+    })))
+
+    const filteredChunks = scoredChunks
+      .filter(chunk => chunk.similarity > 0.3) // Lower threshold from 0.5 to 0.3
       .slice(0, 20) // Take top 20
 
-    console.log('[RAG Search] Found', scoredChunks.length, 'matching chunks')
+    console.log('[RAG Search] Found', filteredChunks.length, 'matching chunks (threshold: 0.3)')
 
-    if (scoredChunks.length === 0) {
+    if (filteredChunks.length === 0) {
       return NextResponse.json({
         results: [],
-        debug: 'Nem találtunk releváns dokumentumokat a kereséshez'
+        debug: `Nem találtunk releváns dokumentumokat a kereséshez. Legjobb egyezés: ${scoredChunks[0]?.similarity.toFixed(3) || 'N/A'}`
       })
     }
 
     // Get document info for matched chunks
-    const matchedDocIds = [...new Set(scoredChunks.map(c => c.document_id))]
+    const matchedDocIds = [...new Set(filteredChunks.map(c => c.document_id))]
     const docMap = new Map(completedDocs.map(d => [d.id, d]))
 
     // Group by document
@@ -195,7 +203,7 @@ export async function POST(request: NextRequest) {
       chunkCount: number
     }>()
 
-    for (const chunk of scoredChunks) {
+    for (const chunk of filteredChunks) {
       const doc = docMap.get(chunk.document_id)
       if (!doc) continue
 
