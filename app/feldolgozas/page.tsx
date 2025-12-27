@@ -16,6 +16,7 @@ interface DocumentData {
   id: string
   filename: string
   file_path: string
+  file_url?: string
   mime_type: string
   file_size: number
   status: string
@@ -283,9 +284,9 @@ function FeldolgozasContent() {
 
                 {/* Document Preview */}
                 <div className="bg-gray-50 rounded-lg border border-kavosz-border p-4 mb-4 aspect-[3/4] flex items-center justify-center">
-                  {document.mime_type.startsWith('image/') ? (
+                  {document.mime_type.startsWith('image/') && document.file_url ? (
                     <img
-                      src={document.file_path}
+                      src={document.file_url}
                       alt={document.filename}
                       className="max-w-full max-h-full object-contain rounded"
                     />
@@ -304,7 +305,7 @@ function FeldolgozasContent() {
 
                 {/* Download Button */}
                 <a
-                  href={document.file_path}
+                  href={document.file_url || document.file_path}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-white bg-kavosz-teal-primary hover:bg-kavosz-teal-hover rounded-lg transition-colors"

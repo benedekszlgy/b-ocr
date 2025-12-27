@@ -48,9 +48,22 @@ export async function GET(
       confidence: f.confidence
     })) || []
 
+    // Generate signed URL for file access
+    let signedUrl = document.file_path
+    if (document.file_path) {
+      const { data: urlData } = await supabase.storage
+        .from('documents')
+        .createSignedUrl(document.file_path, 3600) // 1 hour expiry
+
+      if (urlData?.signedUrl) {
+        signedUrl = urlData.signedUrl
+      }
+    }
+
     return NextResponse.json({
       document: {
         ...document,
+        file_url: signedUrl, // Add signed URL for downloading/viewing
         extractedFields
       }
     })
